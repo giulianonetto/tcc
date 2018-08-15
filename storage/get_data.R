@@ -15,10 +15,12 @@ source("http://bioconductor.org/biocLite.R")
 biocLite("GEOquery")
 library(GEOquery)
 
-mydir <- getwd()
+mydir <- '/home/giulianonetto/windows/tcc/storage/'
 datadir <- "~/windows/tcc/Datasets"
 setwd(datadir)
 system("find . -type d -name '*GSE*' > list.txt")
+system("mv list.txt /home/giulianonetto/windows/tcc/storage/")
+setwd(mydir)
 system("grep -o 'GSE[ ]*[0-9]\\+' list.txt > list1.txt")
 system("sed -i 's/ //g' list1.txt")
 system("grep -o '[A-Z][a-zA-Z]\\+, [0-9]\\+[a-z]*' list.txt > list2.txt")

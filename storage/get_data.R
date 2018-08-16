@@ -31,4 +31,3 @@ c1 <- as.vector(read.csv('list1.txt', header = FALSE)[,1])
 c2 <- as.vector(read.csv('list2.txt', header = FALSE, sep = '\t')[,1])
 df <- data.frame(c1, c2)
 write.table(df, file="datasets.tsv", sep = "\t", row.names = FALSE, col.names = c("geo", "paper"))
-

@@ -1,63 +1,65 @@
-"geo"	"paper"
-"GSE28042"	"HerazoMaya, 2013b"
-"GSE28221"	"HerazoMaya, 2013a"
-"GSE89953"	"Morrel, 2017"
-"GSE47460"	"Bauer, 2015a"
-"GSE53845"	"DePianto, 2015"
-"GSE33566"	"Yang, 2012"
-"GSE73854"	"Chanda, 2016"
-"GSE40151"	"Peng, 2013b"
-"GSE15197"	"Rajkumar, 2010"
-"GSE85411"	"Zhao, 2018"
-"GSE49144"	"Umbright, 2017"
-"GSE86618"	"Xu, 2016b"
-"GSE77326"	"XLv, 2017"
-"GSE485"	"Chen, 2003"
-"GSE11665"	"Boon, 2009"
-"GSE28122"	"DAlessandroGabazza, 2012"
-"GSE8504"	"Bauer, 2009"
-"GSE10921"	"Vuga, 2009"
-"GSE8553"	"Brass, 2007"
-"GSE98468"	"Liu, 2017"
-"GSE66634"	"Sontake, 2015"
-"GSE42301"	"Cabrera, 2013"
-"GSE36208"	"Sellamuthu, 2012"
-"GSE42564"	"Tsukui, 2013"
-"GSE83501"	"Xi, 2017"
-"GSE107797"	"ElChemaly, 2018"
-"GSE94555"	"Xu, 2016a"
-"GSE83717"	"Vukmirovic, 2017"
-"GSE49072"	"Rosas, 2013"
-"GSE79544"	"Lee, 2018"
-"GSE27721"	"Wynn, 2011"
-"GSE2052"	"Pardo, 2005"
-"GSE45789"	"Honeyman, 2013"
-"GSE21369"	"Cho, 2011"
-"GSE2018"	"Gimino, 2004"
-"GSE27957"	"HerazoMaya, 2013c"
-"GSE92592"	"Schafer, 2017"
-"GSE30216"	"Sellamuthu, 2011"
-"GSE54463"	"Ni, 2014"
-"GSE44723"	"Peng, 2013a"
-"GSE27430"	"Milosevic, 2012"
-"GSE109913"	"Liu, 2018"
-"GSE48455"	"Bauer, 2015b"
-"GSE90010"	"Marwick, 2016"
-"GSE47189"	"Xue, 2014"
-"GSE82158"	"Misharin, 2017"
-"GSE24206"	"Meltzer, 2011"
-"GSE110147"	"Mura, 2018"
-"GSE13316"	"Pandit, 2010"
-"GSE71351"	"Lee, 2017"
-"GSE59120"	"Marconett, 2017"
-"GSE85411"	"Haston, 2005"
-"GSE32147"	"Sellamuthu, 2013"
-"GSE17978"	"EmblomCallahan, 2010"
-"GSE16846"	"Scotton, 2009"
-"GSE38958"	"Huang, 2015"
-"GSE41572"	"Sellamuthu, 2017"
-"GSE40839"	"Lindahl, 2013"
-"GSE24323"	"Xie, 2011"
-"GSE72073"	"Geng, 2015"
-"GSE94699"	"Mccubbrey, 2017"
-"GSE61709"	"Shichino, 2015"
+author	year	geo	organism	tissue	treatment	technology	brand	time-series	raw	observations
+Chen	2003	GSE485								
+Gimino	2004	GSE2018								
+Pardo	2005	GSE2052								
+Haston	2005	GSE85411								
+Brass	2007	GSE8553								
+Boon	2009	GSE11665								
+Bauer	2009	GSE8504								
+Vuga	2009	GSE10921								
+Scotton	2009	GSE16846								
+Rajkumar	2010	GSE15197								
+Pandit	2010	GSE13316								
+EmblomCallahan	2010	GSE17978								
+Wynn	2011	GSE27721								
+Cho	2011	GSE21369								
+Sellamuthu	2011	GSE30216								
+Meltzer	2011	GSE24206								
+Xie	2011	GSE24323								
+Yang	2012	GSE33566								
+DAlessandroGabazza	2012	GSE28122								
+Sellamuthu	2012	GSE36208								
+Milosevic	2012	GSE27430								
+HerazoMaya	2013	GSE28221								
+Peng	2013	GSE40151								
+Blaauboer	2013	GSE37635								
+Cabrera	2013	GSE42301								
+Tsukui	2013	GSE42564								
+Rosas	2013	GSE49072								
+Honeyman	2013	GSE45789								
+HerazoMaya	2013	GSE27957								
+Peng	2013	GSE44723								
+Sellamuthu	2013	GSE32147								
+Lindahl	2013	GSE40839								
+Ni	2014	GSE54463								
+Xue	2014	GSE47189								
+Bauer	2015	GSE47460								
+DePianto	2015	GSE53845								
+Sontake	2015	GSE66634								
+Bauer	2015	GSE48455	rat	lung	bleomycin	microarray	agilent	yes	yes	
+Huang	2015	GSE38958								
+Geng	2015	GSE72073								
+Shichino	2015	GSE61709								
+Chanda	2016	GSE73854								
+Xu	2016	GSE86618								
+Xu	2016	GSE94555								
+Peng	2016	GSE47460	human	lung	ipfVScontrol	microarray	agilent	no	yes	Bauer, 2015a
+Marwick	2016	GSE90010								
+Morrel	2017	GSE89953								
+Umbright	2017	GSE49144								
+XLv	2017	GSE77326								
+Liu	2017	GSE98468								
+Xi	2017	GSE83501								
+Vukmirovic	2017	GSE83717								
+Schafer	2017	GSE92592								
+Misharin	2017	GSE82158	mice							
+Lee	2017	GSE71351	human	Fibroblasts – lung cells	ipfVScontrol	microarray	illumina	no	yes	controls with cancer
+Marconett	2017	GSE59120	rat	alveolar epithelial cells – culture, bal, organs	differentiationcancer	microarray	illumina	no	yes	multiple organ, GSE38570, GSE38571, GSE66627
+Sellamuthu	2017	GSE41572	rat	lung, bal, blood	silica	microarray	illumina	no	yes	
+Mccubbrey	2017	GSE94699	mice	macrophages – lung cells	bleomycin	rnaseq	iontorrent	no	yes	residentVSimigrant
+Zhao	2018	GSE85411	mice	bal cells	Bleomycin, wtVSs1prko	microarray	agilent	no	yes	
+ElChemaly	2018	GSE107797	human	pbmc	fpfVShspfvscontrol	microarray	affymetrix	no	yes	family
+Lee	2018	GSE79544	human	alveolar macrophages – bal cells	ipfVScontrol	rnaseq	nextseq	no	yes	ipf smokers
+Chia	2018	GSE109372	mice	Macrophages – culture	il4, il33	microarray	agilent	no	yes	RAW264 
+Liu	2018	GSE109913	mice	alveolar epithelial cells – lung cells	bleomycin, lps	rnaseq	hiseq	maybe	yes	
+Mura	2018	GSE110147	human	lung	ipfVSnsipVSbothVScontrol	microarray	affymetrix	no	yes	no paper, transplant

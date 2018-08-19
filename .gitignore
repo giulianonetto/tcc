@@ -37,3 +37,14 @@ rsconnect/
 
 #Datasets
 Datasets/
+
+#Data within storage
+*/*_data/
+
+#Local Backup
+*/backup/
+#tutorials
+*/tutorials/
+
+#supplementary files
+*/supp/

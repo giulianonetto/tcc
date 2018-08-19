@@ -2,7 +2,7 @@
 library(dplyr)
 library(GEOquery)
 mydir <- getwd()
-datasets <- read.csv("datasets.tsv", sep = "\t", header = T, stringsAsFactors = F)
+datasets <- read.csv("../datasets.tsv", sep = "\t", header = T, stringsAsFactors = F)
 geo <- (datasets %>% filter(author == "Bauer", year == 2015) %>% select(geo) %>% unlist())[2]
 system("mkdir bauer_2015_GSE48455")
 analysis_dir <- "bauer_2015_GSE48455/"
@@ -11,6 +11,7 @@ setwd(analysis_dir)
 #filePaths <- getGEOSuppFiles(GEO = geo)
 data <- getGEO(geo)[[1]]
 
+# vns package for normalizaton and glog transformation
 
 ########### METADATA ############
 library(stringr)
@@ -18,11 +19,7 @@ metadata <- pData(data)
 sample_names <- metadata$geo_accession
 treatment <- metadata$`treatment:ch1`
 times <- metadata$`time:ch1`
-data_processing <- metadata$data_processing[1]
-organism <- metadata$organism_ch1[1]
-scan <- metadata$scan_protocol[1]
-times <- metadata$`time:ch1`
-metadata_clean <- data.frame(sample_names, treatment, times)
+metadata <- data.frame(sample_names, treatment, times)
 D <- vector()
 N <- vector()
 times_clean <- vector()
@@ -39,14 +36,34 @@ for (i in times){
   times_clean <- c(times_clean, n*clean)
 }
 times <- times_clean
-metadata_clean$times <- NULL
-metadata_clean[,"times"] <- times
+metadata$times <- NULL
+metadata[,"times"] <- as.numeric(times)
+
+metadata[metadata$treatment == "NAIVE (UNTREATED)",3] <- c(1,1,1)
+levels(metadata$treatment)[2] <- "CONTROL"
+levels(metadata$treatment)[3] <- "COLTROL"
+
+metadata <- metadata[with(metadata, order(treatment, times)),]
+write.table(metadata, file = "metadata.tsv", sep = "\t", row.names = F)
+
+# Manual editing of data!
+metadata <- read.table("metadata.tsv", header = TRUE, sep = "\t")
+metadata = metadata[with(metadata, order(bleomycin, times)),]
+write.table(metadata, file = "metadata.tsv", sep = "\t", row.names = F)
+# Manual editing of data!
+metadata <- read.table("metadata.tsv", header = TRUE, sep = "\t")
+rownames(metadata) <- metadata$sample_names
+gsm <- substr(metadata$sample_names, start = 8, stop = 10)
+Names <- data.frame(gsm = rownames(metadata), sampleID = paste0("T",metadata$times,"_C",
+                                                     metadata$control, "_B",
+                                                     metadata$bleomycin,"_", gsm))
+write.table(Names, file = "names.tsv", sep = "\t", row.names = F)
+system("sed -i 's/_[CB]0//g' names.tsv")
+Names <- read.table("names.tsv", header = TRUE, sep = "\t")
+rownames(metadata) <- Names$sampleID
 ########## DESIGN MATRIX ############
 library(maSigPro)
-levels(metadata_clean$treatment)[2] <- "NAIVE"
-metadata <- metadata_clean[with(metadata_clean, order(times, treatment)),]
-metadata[6:8,3] <- rep(1, 3)
-metadata <- metadata[with(metadata, order(times, treatment)),]
-rownames(metadata) <- c()
-rownames(metadata)
-write.table(metadata, file = "metadata.tsv", sep = "\t", row.names = F)
+
+edesign <- metadata[,3:6]
+
+

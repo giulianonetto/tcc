@@ -39,12 +39,12 @@ rsconnect/
 Datasets/
 
 #Data within storage
-*/*_data/
+*/*_data/*
 
 #Local Backup
-*/backup/
+*/backup/*
 #tutorials
-*/tutorials/
+*/tutorials/*
 
 #supplementary files
-*/supp/
+*/supp/*

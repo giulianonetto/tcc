@@ -43,8 +43,23 @@ Datasets/
 
 #Local Backup
 backup/
+
 #tutorials
 tutorials/
 
+#.idea
+.idea/
+
+#papers
+papers/
+
+#expression files
+*expression_matrix*
+
+#pdf files
+*.pdf
+
 #supplementary files
 supp/
+
+

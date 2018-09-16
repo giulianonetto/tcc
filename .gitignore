@@ -62,4 +62,6 @@ papers/
 #supplementary files
 supp/
 
+#.odt files
+*.odt
 

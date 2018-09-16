@@ -18,7 +18,7 @@ for key, value in meta.items():
     elif value[2] == "D":
         n = 1
     else:
-        print(value[2], "WHAT THE FUCK")
+        print(value[2], "ERROR")
         break
     meta[key] = [value[0], n*value[1]]
     if meta[key][0] == "bleomycin-treated":

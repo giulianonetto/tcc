@@ -1,0 +1,80 @@
+
+PROJETO
+=======
+
+Análise genômica dos perfis de macrófagos durante o
+desenvolvimento de Fibrose Pulmonar Idiopática
+==================================================================================================
+
+Objetivo Geral:
+
+Identificar biomarcadores genéticos correlacionados com a
+cinética histopatológica da Fibrose Pulmonar Idiopática.
+
+Objetivos Específicos:
+----------------------
+
+Mapear o perfil temporal do enriquecimento de assinaturas
+genéticas de subtipos de macrófagos em modelos animais de
+Fibrose Pulmonar Idiopática;
+
+Construir razão de biomarcadores capaz de mimetizar os perfis
+identificados no item (1);
+
+Mapear o perfil temporal da razão construída no item (2) em
+pacientes com Fibrose Pulmonar Idiopática em diferentes
+estágios histopatológicos.
+
+Problema Abordado:
+------------------
+
+Determinar se a cinética de macrófagos pulmonares explica o
+desenvolvimento de Fibrose Pulmonar Idiopática.
+
+Justificativa:
+--------------
+
+Necessidade de biomarcadores para (1) determinar a velocidade de
+progressão histopatológica do paciente com Fibrose Pulmonar
+Idiopática; e (2) prever o desenvolvimento de Fibrose Pulmonar
+Idiopática futuramente em pacientes suspeitos;
+
+Necessidade de identificar alvos terapêuticos atuantes em
+diferentes estágios da Fibrose Pulmonar Idiopática.
+
+Principais Resultados Esperados:
+--------------------------------
+
+Obter uma razão de expressão entre dois conjuntos de genes que
+tenha correlação direta com o desenvolvimento histopatológico
+da Fibrose Pulmonar Idiopática;
+
+Determinar o perfil temporal dos subtipos de macrófagos tanto em
+modelos animais de Fibrose Pulmonar Idiopática quanto em
+pacientes com a doença;
+
+Ratificar ou retificar os perfis temporais de macrófagos, nas
+condições acima descritas, observados hoje por técnicas
+não-genômicas;
+
+Observação dos diferentes pathways atuantes nos diferentes
+estágios da Fibrose Pulmonar Idiopática.
+
+Contribuição Científica do Estudo:
+----------------------------------
+
+Um artigo científico com análise genômica temporal dos subtipos
+de macrófagos e pathways envolvidos no desenvolvimento de
+Fibrose Pulmonar Idiopática – modelos animais e humanos —,
+descrevendo a base genômica para a razão de biomarcadores
+construída.
+
+Um artigo científico com testes de validação da correlação entre
+a razão construída (e sua derivada) e a histopatologia das
+pacientes com Fibrose Pulmonar Idiopática.
+
+Bases genômicas para seleção de analitos em posterior projeto de
+tese de doutoramento a ser submetida pelo Programa de
+Pós-Graduação _____________________________ do Hospital de
+Clínicas de Porto Alegre.
+

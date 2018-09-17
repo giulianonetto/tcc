@@ -1,0 +1,14 @@
+---
+title: "introduction"
+output: 
+  odt_document:
+    reference_odt: ../tcc.odt
+    
+bibliography: library.bib
+csl: elsevier-vancouver.csl
+---
+
+
+
+
+Idiopathic Pulmonary Fibrosis (IPF) is a deadly disease for which there is no cure currently available.

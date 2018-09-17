@@ -1,0 +1,56 @@
+---
+title: "HERE IS THE TITLE OF MY ABSTRACT"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE, cache=FALSE, echo=FALSE}
+library(rmarkdown)
+```
+
+
+Authors: John H. Curry^1^, Kathy S. James^1^, Patrick S. Curry^1^ 
+
+\newline
+
+Affiliations: ^1^University of Michigan  
+
+\newline  \newline
+
+*Presenting author information*  
+Name: John H. Curry  
+Email: curry@umed.edu  
+Affiliation details: Kinesiology, University of Somewhere, Ottawa, Canada  
+
+\newline \newline
+
+*Coauthor #2*  
+Name: Kathy S. James  
+Email: james@umed.edu   
+Affiliation details: Kinesiology, University of Somewhere, Ottawa, Canada  
+
+\newline \newline
+
+*Coauthor #3*  
+Name: Patrick S. Curry  
+Email: curry2@umed.edu  
+Affiliation details: Kinesiology, University of Somewhere, Ottawa, Canada  
+
+\newline \newline
+
+## Introduction
+Here is where I write my introduction....
+
+\newline \newline
+
+## Methods
+Here is where I write my methods
+
+\newline \newline
+
+
+## Results
+Here is where I write my results..

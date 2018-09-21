@@ -1,0 +1,52 @@
+---
+title: "XueModules"
+author: "Giuliano Netto Flores Cruz"
+date: "September 20, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(DT)
+```
+# Modules from Xue, 2014.
+9498 unique present genes were clustered into 49 modules. 
+M1-, M2- and TPP-associated modules are 7-9, 13-15, and 30, 32-33, respecitively.
+
+```{r echo=FALSE}
+setwd("/home/giulianonetto/windows/tcc/checklist/genesigs/papers/Xue, 2014")
+library(stringr)
+dat <- read.table('modules.csv', sep = '\t', header = T, stringsAsFactors = F)
+
+dat_colnames <- colnames(dat)
+dat_colnames_new = vector()
+for (i in 1:ncol(dat)){
+  old <- str_extract(dat_colnames[i], "[0-9]+")
+  new = paste0("Module", old)
+  dat_colnames_new = c(dat_colnames_new, new)
+}
+colnames(dat) <- dat_colnames_new
+
+datatable(dat, rownames = FALSE, filter = 'top',
+          caption = "Table 1. Modules defined by Xue, 2014.",
+          options=list(pageLength = 100, scrollX='400px', scrollY='400px',
+          lengthMenu = c(30, 100, 1000) 
+
+  )
+)
+
+uq_elem=c()
+for(i in 1:ncol(dat))
+{
+  uq_elem=c(unique(dat[,i]), uq_elem)
+  uq_elem=unique(uq_elem)
+}
+genes_list <- data.frame('GeneSymbols' =uq_elem)
+
+datatable(genes_list, filter = 'top',
+          caption = "Table 2. Genes included in modules by Xue, 2014.",
+          options=list(pageLength = 100, scrollX='400px', scrollY='400px',
+          lengthMenu = c(30, 100, 1000)))
+
+```
+

@@ -67,3 +67,9 @@ supp/
 
 # tmp files
 tmp/
+# Mendeley and other references library
+*.lib
+*.bib
+
+# Checklist Files
+checklist/

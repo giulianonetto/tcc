@@ -16,6 +16,7 @@ M1-, M2- and TPP-associated modules are 7-9, 13-15, and 30, 32-33, respecitively
 ```{r echo=FALSE}
 
 library(stringr)
+library(ggplot2)
 dat <- read.table('modules.csv', sep = '\t', header = T, stringsAsFactors = F)
 
 dat_colnames <- colnames(dat)
@@ -34,6 +35,23 @@ datatable(dat, rownames = FALSE, filter = 'top',
 
   )
 )
+
+# make bar plot for numb of genes per module
+colcount <- data.frame()
+for(i in 1:ncol(dat)){
+  module = colnames(dat)[i]
+  Counts =  length(unique(dat[[i]])) - 1
+  colcount = rbind(colcount,data.frame(module, Counts))
+}
+
+ggplot(colcount)+
+  geom_col(aes(x=module, y=Counts))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  guides(fill=FALSE, colour=FALSE)+
+  ylab("Number of genes")+
+  ggtitle("Number of genes per module")+
+  theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16))
+
 ```
 
 List of Genes used for the 49 modules defined by Xue, 2014. Human gene symbols were converted to the respective mouse orthologues by combining information from Ensembl BioMart ( http://www.ensembl.org/biomart/martview ) using the species specific gene symbols and Ensembl Gene IDs.. For some of the genes BioGPS (http://biogps.org/#goto=welcome) was used if no orthologue was found in BioMart
@@ -51,4 +69,6 @@ datatable(genes_list, filter = 'top',
           caption = "Table 2. Genes included in modules by Xue, 2014.",
           options=list(pageLength = 100, scrollX='400px', scrollY='400px',
           lengthMenu = c(30, 100, 1000)))
+
 ```
+

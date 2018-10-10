@@ -71,3 +71,7 @@ tmp/
 *.lib
 *.bib
 
+*.lib
+*.docx
+*.zip
+*.bib

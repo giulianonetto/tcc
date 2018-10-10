@@ -13,7 +13,7 @@ library(DT)
 9498 unique present genes were clustered into 49 modules. 
 M1-, M2- and TPP-associated modules are 7-9, 13-15, and 30, 32-33, respecitively.
 
-```{r echo=FALSE}
+```{r fig.height = 6, fig.width = 9, fig.align = "center", echo=FALSE, warning=FALSE, out }
 
 library(stringr)
 library(ggplot2)
@@ -44,8 +44,8 @@ for(i in 1:ncol(dat)){
   colcount = rbind(colcount,data.frame(module, Counts))
 }
 
-ggplot(colcount)+
-  geom_col(aes(x=module, y=Counts))+
+ggplot(colcount, aes(x=module, y=Counts))+
+  geom_bar(width = 0.75, position = position_dodge(width = 0.9), stat = "identity")+
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   guides(fill=FALSE, colour=FALSE)+
   ylab("Number of genes")+
@@ -54,21 +54,16 @@ ggplot(colcount)+
 
 ```
 
-List of Genes used for the 49 modules defined by Xue, 2014. Human gene symbols were converted to the respective mouse orthologues by combining information from Ensembl BioMart ( http://www.ensembl.org/biomart/martview ) using the species specific gene symbols and Ensembl Gene IDs.. For some of the genes BioGPS (http://biogps.org/#goto=welcome) was used if no orthologue was found in BioMart
+List of Genes used for the 49 modules defined by Xue, 2014 - human and mouse
+orthologs. Human gene symbols were converted to the respective mouse orthologues by combining information from Ensembl BioMart ( http://www.ensembl.org/biomart/martview ) using the species specific gene symbols. For some of the genes, BioGPS (http://biogps.org/#goto=welcome) was used if no orthologue was found in BioMart.
 
 ```{r echo=FALSE}
-uq_elem=c()
-for(i in 1:ncol(dat))
-{
-  uq_elem=c(unique(dat[,i]), uq_elem)
-  uq_elem=unique(uq_elem)
-}
-genes_list <- data.frame('GeneSymbols' =uq_elem)
+human_mouse_map = read.csv('/home/giulianonetto/windows/tcc/checklist/genesigs/human_mouse.map', sep = '\t', header = T, stringsAsFactors = F)
 
-datatable(genes_list, filter = 'top',
-          caption = "Table 2. Genes included in modules by Xue, 2014.",
+suppressWarnings(datatable(human_mouse_map, filter = 'top',
+          caption = "Table 2. Human genes from macrophage modules by Xue, 2014 - along with mouse orthologs.",
           options=list(pageLength = 100, scrollX='400px', scrollY='400px',
-          lengthMenu = c(30, 100, 1000)))
+          lengthMenu = c(30, 100, 1000))))
 
 ```
 

@@ -13,7 +13,7 @@ library(DT)
 9498 unique present genes were clustered into 49 modules. 
 M1-, M2- and TPP-associated modules are 7-9, 13-15, and 30, 32-33, respecitively.
 
-```{r fig.height = 6, fig.width = 9, fig.align = "center", echo=FALSE, warning=FALSE, out }
+```{r fig.height = 8, fig.width = 15, fig.align = "center", echo=FALSE, warning=FALSE, message=FALSE}
 
 library(stringr)
 library(ggplot2)
@@ -37,6 +37,15 @@ datatable(dat, rownames = FALSE, filter = 'top',
 )
 
 # make bar plot for numb of genes per module
+dat_colnames <- colnames(dat)
+dat_colnames_new = vector()
+for (i in 1:ncol(dat)){
+  old <- str_extract(dat_colnames[i], "[0-9]+")
+  new = as.character(old)
+  dat_colnames_new = c(dat_colnames_new, new)
+}
+colnames(dat) <- dat_colnames_new
+
 colcount <- data.frame()
 for(i in 1:ncol(dat)){
   module = colnames(dat)[i]
@@ -44,13 +53,26 @@ for(i in 1:ncol(dat)){
   colcount = rbind(colcount,data.frame(module, Counts))
 }
 
-ggplot(colcount, aes(x=module, y=Counts))+
-  geom_bar(width = 0.75, position = position_dodge(width = 0.9), stat = "identity")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  guides(fill=FALSE, colour=FALSE)+
-  ylab("Number of genes")+
-  ggtitle("Number of genes per module")+
-  theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16))
+color_factor = factor(c(rep(1, 6), rep(2,3), rep(1,3), rep(3,3), rep(1,14), 4,1,rep(4,2), rep(1,16)), 
+                      labels = c("Other stimuli", "M1-associated",
+                                 "M2-associated", "TPP-associated"))
+
+ggplot(colcount, aes(x=module, y=Counts, fill=color_factor))+
+  geom_bar(width = 0.7, position = position_dodge(width = 0.9), stat = "identity")+
+  scale_fill_manual(values = c("gray45", "red", "blue", "green"))+
+  guides(fill = guide_legend(reverse=T))+
+  scale_y_log10(breaks=c(10^2, 10^3))+
+  coord_cartesian(ylim = c(10^1.5, 10^3))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1.2, face = "bold", size = 11),
+        axis.text.y = element_text(face = "bold", size = 15),
+        plot.title = element_text(hjust = 0.5, face = "bold", size = 35),
+        axis.title.x = element_text(face = "bold", size = 30),
+        axis.title.y = element_text(face = "bold", size = 30),
+        legend.title=element_blank(),
+        legend.text = element_text(face="bold", size = 15))+
+  ylab("Number of genes\n")+
+  xlab("\nModules")+
+  ggtitle("Number of genes per module\n")
 
 ```
 

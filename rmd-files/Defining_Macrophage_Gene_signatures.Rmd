@@ -10,12 +10,12 @@ output:
 ---
 
 ```{r setup, include=FALSE, echo=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, root.dir = '/home/giulianonetto/windows/tcc/')
 ```
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(
-  fig.path = "Defining_Macrophage_Gene_signatures_files/figure-docx/out-"
+  fig.path = "rmd-files/Defining_Macrophage_Gene_signatures_files/figure-docx/"
 )
 ```
 

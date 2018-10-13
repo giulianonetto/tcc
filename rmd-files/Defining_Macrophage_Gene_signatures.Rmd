@@ -29,7 +29,7 @@ knitr::opts_chunk$set(
   
   In order to achieve high sensivity for potential macrophage phenotypes, in this study the 49 transcriptional modules produced by Xue and colleagues were used as gene sets for further analysis. The Figure 1 shows the distribution of number of genes across the different modules.
   
-```{r Figure1, fig.height = 8, fig.width = 15, fig.align = "center", echo=FALSE, warning=FALSE }
+```{r Figure, fig.height = 8, fig.width = 15, fig.align = "center", echo=FALSE, warning=FALSE }
 
 library(stringr)
 library(ggplot2)

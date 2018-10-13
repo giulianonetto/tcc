@@ -10,7 +10,7 @@ output:
 ---
 
 ```{r setup, include=FALSE, echo=FALSE}
-knitr::opts_chunk$set(echo = FALSE, root.dir = '/home/giulianonetto/windows/tcc/rmd-files')
+knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r, echo = FALSE}

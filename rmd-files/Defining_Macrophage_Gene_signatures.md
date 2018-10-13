@@ -5,7 +5,7 @@ date: "October 9, 2018"
 bibliography: library.bib
 csl: abnt-ufrgs-initials.csl
 output: 
-  word_document: 
+  html_document: 
     keep_md: yes
 ---
 
@@ -23,4 +23,4 @@ output:
   
   In order to achieve high sensivity for potential macrophage phenotypes, in this study the 49 transcriptional modules produced by Xue and colleagues were used as gene sets for further analysis. The Figure 1 shows the distribution of number of genes across the different modules.
   
-![](Defining_Macrophage_Gene_signatures_files/figure-docx/out-1.pngout-1.png)<!-- -->
+<img src="Defining_Macrophage_Gene_signatures_files/figure-docx/out-1.pngout-1.png" style="display: block; margin: auto;" />

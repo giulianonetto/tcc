@@ -9,11 +9,11 @@ output:
     keep_md: yes
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, echo=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-#Defining Macrophage Gene Signatures
+# Defining Macrophage Gene Signatures
 
   Macrophages have been demonstrated to develop highly complex activation profiles in a diverse set of microenvironments [@Ginhoux2016]. Although many genetic markers are known to play important roles within the macrophage biology context, defining a robust set of gene signatures for the currently known phenotypic subsets remains a challenging task [@Martinez2014]. Recent cytometric and genomic approaches have revealed major limitations regarding the classic M1 versus M2-polarization model, which is no longer accepted as suitable to explain the biologic dynamics of macrophage response [@Martinez2014].
   

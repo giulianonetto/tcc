@@ -11,6 +11,7 @@ output:
 
 
 
+
 # Defining Macrophage Gene Signatures
 
   Macrophages have been demonstrated to develop highly complex activation profiles in a diverse set of microenvironments [@Ginhoux2016]. Although many genetic markers are known to play important roles within the macrophage biology context, defining a robust set of gene signatures for the currently known phenotypic subsets remains a challenging task [@Martinez2014]. Recent cytometric and genomic approaches have revealed major limitations regarding the classic M1 versus M2-polarization model, which is no longer accepted as suitable to explain the biologic dynamics of macrophage response [@Martinez2014].
@@ -21,4 +22,4 @@ output:
   
   In order to achieve high sensivity for potential macrophage phenotypes, in this study the 49 transcriptional modules produced by Xue and colleagues were used as gene sets for further analysis. The Figure 1 shows the distribution of number of genes across the different modules.
   
-![](Defining_Macrophage_Gene_signatures_files/figure-docx/out-1.png)<!-- -->
+![](Defining_Macrophage_Gene_signatures_files/figure-docx/out-1.pngout-1.png)<!-- -->

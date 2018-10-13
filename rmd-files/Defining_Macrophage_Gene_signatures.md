@@ -9,9 +9,7 @@ output:
     keep_md: yes
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-```
+
 
 #Defining Macrophage Gene Signatures
 
@@ -23,47 +21,4 @@ knitr::opts_chunk$set(echo = FALSE)
   
   In order to achieve high sensivity for potential macrophage phenotypes, in this study the 49 transcriptional modules produced by Xue and colleagues were used as gene sets for further analysis. The Figure 1 shows the distribution of number of genes across the different modules.
   
-```{r fig.height = 8, fig.width = 15, fig.align = "center", echo=FALSE, warning=FALSE, out }
-
-library(stringr)
-library(ggplot2)
-library(scales)
-dat <- read.table('/home/giulianonetto/windows/tcc/checklist/genesigs/papers/Xue, 2014/modules.csv', sep = '\t', header = T, stringsAsFactors = F)
-
-dat_colnames <- colnames(dat)
-dat_colnames_new = vector()
-for (i in 1:ncol(dat)){
-  old <- str_extract(dat_colnames[i], "[0-9]+")
-  new = as.character(old)
-  dat_colnames_new = c(dat_colnames_new, new)
-}
-colnames(dat) <- dat_colnames_new
-color_factor = factor(c(rep(1, 6), rep(2,3), rep(1,3), rep(3,3), rep(1,14), 4,1,rep(4,2), rep(1,16)), 
-                      labels = c("Other stimuli", "M1-associated",
-                                 "M2-associated", "TPP-associated"))
-# make bar plot for numb of genes per module
-colcount <- data.frame()
-for(i in 1:ncol(dat)){
-  module = colnames(dat)[i]
-  Counts =  length(unique(dat[[i]])) - 1
-  colcount = rbind(colcount,data.frame(module, Counts))
-}
-
-ggplot(colcount, aes(x=module, y=Counts, fill=color_factor))+
-  geom_bar(width = 0.7, position = position_dodge(width = 0.9), stat = "identity")+
-  scale_fill_manual(values = c("gray45", "red", "blue", "green"))+
-  guides(fill = guide_legend(reverse=T))+
-  scale_y_log10(breaks=c(10^2, 10^3))+
-  coord_cartesian(ylim = c(10^1.5, 10^3))+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1.2, face = "bold", size = 11),
-        axis.text.y = element_text(face = "bold", size = 15),
-        plot.title = element_text(hjust = 0.5, face = "bold", size = 35),
-        axis.title.x = element_text(face = "bold", size = 30),
-        axis.title.y = element_text(face = "bold", size = 30),
-        legend.title=element_blank(),
-        legend.text = element_text(face="bold", size = 15))+
-  ylab("Number of genes\n")+
-  xlab("\nModules")+
-  ggtitle("Number of genes per module\n")
-
-```
+![](Defining_Macrophage_Gene_signatures_files/figure-docx/out-1.png)<!-- -->

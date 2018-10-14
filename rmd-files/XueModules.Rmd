@@ -2,9 +2,7 @@
 title: "XueModules"
 author: "Giuliano Netto Flores Cruz"
 date: "September 20, 2018"
-output: 
-  html_document:
-    keep_md: true
+output: html_document
 ---
 
 ```{r setup, include=FALSE}

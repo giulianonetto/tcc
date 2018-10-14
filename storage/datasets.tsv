@@ -16,6 +16,9 @@ Cho	2011	GSE21369
 Sellamuthu	2011	GSE30216								
 Meltzer	2011	GSE24206								
 Xie	2011	GSE24323								
+Orozco	2012	GSE38705	mice	Macrophages	lpsVSoxpapcVScontrol	microarray	affymetrix	no	yes	cited by Buscher, 2017; Codoni, 2016
+Sears	2012	GSE27002,	human	bal cells	smokers	microarray	affymetrix	no	yes	cited by Buscher, 2017
+Reynier	2012	GSE40885	human	bal cells	lps	microarray	affymetrix	no	yes	cited by Buscher, 2017
 Yang	2012	GSE33566								
 DAlessandroGabazza	2012	GSE28122								
 Sellamuthu	2012	GSE36208								
@@ -43,7 +46,7 @@ Shichino	2015	GSE61709
 Chanda	2016	GSE73854								
 Xu	2016	GSE86618								
 Xu	2016	GSE94555								
-Peng	2016	GSE47460	human	lung	ipfVScontrol	microarray	agilent	no	yes	Bauer, 2015a
+Peng	2016	GSE47460	human	lung	ipf	microarray	agilent	no	yes	Bauer, 2015a
 Marwick	2016	GSE90010								
 Morrel	2017	GSE89953								
 Umbright	2017	GSE49144								
@@ -53,13 +56,13 @@ Xi	2017	GSE83501
 Vukmirovic	2017	GSE83717								
 Schafer	2017	GSE92592								
 Misharin	2017	GSE82158	mice							
-Lee	2017	GSE71351	human	Fibroblasts – lung cells	ipfVScontrol	microarray	illumina	no	yes	controls with cancer
-Marconett	2017	GSE59120	rat	alveolar epithelial cells – culture, bal, organs	differentiationcancer	microarray	illumina	no	yes	multiple organ, GSE38570, GSE38571, GSE66627
+Lee	2017	GSE71351	human	Fibroblasts – lung cells	ipf	microarray	illumina	no	yes	controls with cancer
+Marconett	2017	GSE59120	rat	alveolar epithelial cells – culture, bal, organs	cancer	microarray	illumina	no	yes	multiple organ, GSE38570, GSE38571, GSE66627
 Sellamuthu	2017	GSE41572	rat	lung, bal, blood	silica	microarray	illumina	no	yes	
 Mccubbrey	2017	GSE94699	mice	macrophages – lung cells	bleomycin	rnaseq	iontorrent	no	yes	residentVSimigrant
-Zhao	2018	GSE85411	mice	bal cells	Bleomycin, wtVSs1prko	microarray	agilent	no	yes	
+Zhao	2018	GSE85411	mice	bal cells	bleomycin	microarray	agilent	no	yes	
 ElChemaly	2018	GSE107797	human	pbmc	fpfVShspfvscontrol	microarray	affymetrix	no	yes	family
-Lee	2018	GSE79544	human	alveolar macrophages – bal cells	ipfVScontrol	rnaseq	nextseq	no	yes	ipf smokers
+Lee	2018	GSE79544	human	alveolar macrophages – bal cells	ipf	rnaseq	Illumina-NextSeq500	no	yes	ipf smokers
 Chia	2018	GSE109372	mice	Macrophages – culture	il4, il33	microarray	agilent	no	yes	RAW264 
 Liu	2018	GSE109913	mice	alveolar epithelial cells – lung cells	bleomycin, lps	rnaseq	hiseq	maybe	yes	
 Mura	2018	GSE110147	human	lung	ipfVSnsipVSbothVScontrol	microarray	affymetrix	no	yes	no paper, transplant

@@ -1,7 +1,5 @@
 ---
 title: "Macrophage Gene Signatures"
-author: "Giuliano Netto Flores Cruz"
-date: "October 9, 2018"
 bibliography: library.bib
 csl: abnt-ufrgs-initials.csl
 output: 
@@ -13,6 +11,8 @@ output:
 
 
 
+
+# Defining Macrophage Gene Signatures
 
 ## Macrophage Genomic Integrative Analysis
 
@@ -39,7 +39,7 @@ output:
   
 ![Figure 2 - Gene modules counts distribution.](Defining_Macrophage_Gene_signatures_files/figure-docx/modulesplot-1.png)
 
-
+# References
   
   
   

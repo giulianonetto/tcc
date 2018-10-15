@@ -1,7 +1,5 @@
 ---
 title: "Macrophage Gene Signatures"
-author: "Giuliano Netto Flores Cruz"
-date: "October 9, 2018"
 bibliography: library.bib
 csl: abnt-ufrgs-initials.csl
 output: 
@@ -19,6 +17,8 @@ knitr::opts_chunk$set(
   fig.path = "Defining_Macrophage_Gene_signatures_files/figure-docx/"
 )
 ```
+
+# Defining Macrophage Gene Signatures
 
 ## Macrophage Genomic Integrative Analysis
 
@@ -90,7 +90,7 @@ ggplot(colcount, aes(x=module, y=Counts, fill=color_factor))+
 
 ```
 
-
+# References
   
   
   

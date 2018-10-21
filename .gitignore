@@ -60,21 +60,19 @@ papers/
 *.pdf
 
 #supplementary files
-supp/
+*/supp/
 
 #.odt files
 *.odt
 
 # tmp files
-tmp/
+*/tmp/
 # Mendeley and other references library
 *.lib
 *.bib
-
-*.lib
-*.docx
-*.zip
-*.bib
-*.doc
-bkp/
+*.doc*
+*zip
+*.tar*
+*/bkp/
 *.tsv
+*/data/

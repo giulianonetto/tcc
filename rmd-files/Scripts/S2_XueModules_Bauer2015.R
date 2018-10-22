@@ -1,10 +1,13 @@
 library(GEOquery)
+library(dplyr)
 library(stringr)
 library(limma)
-library(vsn)
+# library(vsn)
 library(rafalib)
-library(genefilter)
+# library(genefilter)
 library(arrayQualityMetrics)
+# -----> always make sure you know where you stand < ------- #
+setwd("/home/giulianonetto/windows/tcc/rmd-files")
 # these guys take a while (over 1GB of space for Supp Data)
 geo <- getGEO("GSE48455")
 # geoSup <- getGEOSuppFiles("GSE48455", makeDirectory = F, baseDir = "~/windows/tcc/rmd-files/data/GSE48455/suppdata/")
@@ -37,21 +40,61 @@ colnames(RG_vsn) <- str_glue('{str_extract(colnames(RG_vsn$M), "GSM[0-9]+")} / {
 probes <- RG_vsn$genes$Status == "cDNA"
 RG_vsn_cDNA <- RG_vsn[probes,]
 
-# Calculate mean between probes that map to the same ge
+# Calculate median between probes that map to the same gene
+# ----> BE AWARE THIS IS NOT VERY COOL - SEE PLOTS IN ()
 
-dupl_probes <- duplicated(RG_vsn_cDNA$genes$ProbeName) # 2367 repeats
-dupl_probes <- RG_vsn_cDNA$genes[dupl_probes, "ProbeName"]
+dupl_probes <- duplicated(RG_vsn_cDNA$genes$ProbeName) 
+dupl_probes_count <- sum(dupl_probes) # 2367 repeats
+dupl_probes <- unique(RG_vsn_cDNA$genes[dupl_probes, "ProbeName"])
+dupl_genes <- duplicated(RG_vsn_cDNA$genes$GeneName)
+dupl_genes <- unique(RG_vsn_cDNA$genes[dupl_genes, "GeneName"])
+
+# See how messy the distribution is for only one gene/probe on 3 different arrays
+plotDensities(RG_vsn_cDNA[which(RG_vsn_cDNA$genes$ProbeName == dupl_probes[1]),1:3]$M)
+plotDensities(RG_vsn_cDNA[which(RG_vsn_cDNA$genes$GeneName == dupl_genes[1]),1:3]$M)
+
 M <- data.frame(RG_vsn_cDNA$M)
 A <- data.frame(RG_vsn_cDNA$A)
-# M$ProbeNames <-RG_vsn_cDNA$genes$ProbeName
+
+# From a list of duplicated probe names, take their expression median and
+# return new M and A data.frames with updated values 
+# i.e. all entries mapping to same probe will have same values
 for (probe in dupl_probes){
   entries <- RG_vsn_cDNA[which(RG_vsn_cDNA$genes$ProbeName == probe),]
   print(str_glue("{probe}:  {dim(entries)[1]} repeats."))
-  M
-  
+  entries$M <- 
+  M[which(RG_vsn_cDNA$genes$ProbeName == probe),] <- data.frame(entries$M) %>%
+    summarise_all(median) %>% as.vector()
+  A[which(RG_vsn_cDNA$genes$ProbeName == probe),] <- data.frame(entries$A) %>%
+    summarise_all(median) %>% as.vector()  
 }
 
-rownames(RG_vsn_cDNA$genes) <- RG_vsn_cDNA$genes$ProbeName 
+RG_vsn_cDNA_dereplicated <- RG_vsn_cDNA
+RG_vsn_cDNA_dereplicated$M <- as.matrix(M)
+RG_vsn_cDNA_dereplicated$A <- as.matrix(A)
+dimnames(RG_vsn_cDNA_dereplicated$M)[[2]] <- dimnames(RG_vsn_cDNA$M)[[2]]
+# Make sure no other alterations were made:
+all.equal(RG_vsn_cDNA_dereplicated$M[!which(RG_vsn_cDNA_dereplicated$genes$ProbeName %in% 
+                                      dupl_probes),], 
+          RG_vsn_cDNA$M[!which(RG_vsn_cDNA$genes$ProbeName %in% 
+                                 dupl_probes),])
+
+# Make sure the difference between 
+# the copy and the unique(copy) matches the number of repeats:
+dim(RG_vsn_cDNA_dereplicated$M)[1] - dim(unique(RG_vsn_cDNA_dereplicated$M))[1] == dupl_probes_count # Awesome!
+RG_vsn_cDNA_dereplicated$M <- unique(RG_vsn_cDNA_dereplicated$M)
+RG_vsn_cDNA_dereplicated$A <- unique(RG_vsn_cDNA_dereplicated$A)
+
+saveRDS(RG_vsn_cDNA_dereplicated, file = "data/GSE48455/suppdata/norm_vsn/RG_vsn_cDNA_dereplicated.rds")
+# STOPPED HERE!!!
+
+
+
+
+
+
+rownames(RG_vsn_cDNA_dereplicated$genes) <- RG_vsn_cDNA$genes$ProbeName
+
 meanSdPlot(RG_vsn_cDNA$M, ranks = T)
 plotDensities(RG_vsn_cDNA$M, legend = F, 
               main = "Distribution of all 72 arrays after VSN Norm.")

@@ -76,3 +76,4 @@ papers/
 */bkp/
 *.tsv
 */data/
+*/tmp/*

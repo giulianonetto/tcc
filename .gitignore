@@ -77,3 +77,4 @@ papers/
 *.tsv
 */data/
 */tmp/*
+.ppt*

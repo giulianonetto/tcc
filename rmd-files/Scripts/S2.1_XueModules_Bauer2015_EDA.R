@@ -4,14 +4,15 @@ library(TcGSA)
 library(biomaRt)
 library(dplyr)
 library(GEOquery)
+library(rafalib)
 # Load Data
 setwd("/home/giulianonetto/windows/tcc/rmd-files")
 eset <- readRDS("data/GSE48455/suppdata/ExpressionSetClean.rds")
 Xue.gmt <- GSA::GSA.read.gmt("data/XueModules/genesets.gmt")
 genesets <- read.csv("data/XueModules/genesets.gmt", 
-                     sep = "\t", header = F, row.names = 1)
+                     sep = "\t", header = F, row.names = 1, stringsAsFactors = F)
 
-is.na(genesets) <- genesets == ""
+# genesets[is.na(genesets)] <- ""
 
 # Build grouping indeces
 
@@ -60,9 +61,9 @@ arg2 <- args[1]
 il12b <- grep("IL12.*", rownames(genexp))[1]
 
 bleo_arrays <- pheno %>% filter(Cy3 == "bleomycin" | Times == 0) %>%
-  arrange(Times) %>% select(Rows, Times)
+  arrange(Times) %>% dplyr::select(Rows, Times)
 control_arrays <- pheno %>% filter(Cy3 == "control") %>%
-  arrange(Times) %>% select(Rows, Times)
+  arrange(Times) %>% dplyr::select(Rows, Times)
 
 
 # Arg1
@@ -102,38 +103,78 @@ control_il12b %>% group_by(Times) %>% summarise(IL12B = mean(IL12B)) %>%
               formula=y ~ poly(x, 3, raw=TRUE),colour="blue")+
   labs(title="IL12b (cntrl) - Bauer2015")
 
-# (IL12B/ARG1) * (median(ARG1)/median(IL12B))
+# (IL12B/ARG1) * (median(ARG1)/median(IL12B)) BLEOMYCIN GROUP
 df <- cbind(bleo_arg1$ARG1,bleo_il12b)
 df <- df %>%
   mutate(Ratio = IL12B / `bleo_arg1$ARG1`, 
          Correction =  median(df$`bleo_arg1$ARG1`) / median(df$IL12B)) %>%
-  mutate(PFR = Ratio * Correction)
+  mutate(PFR = Ratio * Correction) %>% group_by(Times) %>% mutate(PFRm = median(PFR)) %>% as.data.frame()
 
-df %>% group_by(Times) %>% summarise(PFR = median(PFR)) %>% ggplot(aes(x = Times, y = PFR))+
-  geom_point()+stat_smooth(method = "lm", formula = y ~ poly(x, 3, raw = T))+ggtitle("Median PFR")
+# -> Outliers identification functions!
+"
+Studentized residuals with Bonferonni p < 0,05:
+The car::outlierTest() function reports the Bonferroni adjusted p-value for the largest
+absolute studentized residual from your fit [@RobertKabacoff - R in Action].
+"
+ResidualsPlot <- function(Fit, title = ""){
+  res <- rstudent(Fit)
+  Residuals <- data.frame(obs = names(res), values = res) 
+  h = 3*sd(res)
+  ggplot(Residuals, aes(reorder(obs, values), values))+
+    geom_bar(stat = "identity")+
+    theme(text = element_text(family = "Decima WE", color = "grey20"), 
+          axis.text.x = element_text(angle = 90, hjust = 1))+
+    ggtitle(str_glue("Studenized Residuals {title}"))+
+    geom_hline(yintercept=c(h, -h), 
+               linetype="dashed", color = "red")+
+    geom_text(aes(0,h,label = str_glue("3 SD's ({round(h, 2)})"),
+                  hjust = -0.1, vjust = -1.15, 
+                  family = "Courier"), color = "grey40")
+}
+outlierDetec <- function(df, Main = ""){
+  rownames(df) <- paste0("Obs ", rownames(df))
+  fit <- lm(PFR ~ poly(Times, 3, raw = T), data = df)
+  outlierTest(fit) %>% print()
+  qqPlot(fit, labels=row.names(df), 
+         id.method = "identify", simulate = T, 
+         main = str_glue("Q-Q Plot {Main}"))
+  ResidualsPlot(fit, Main)
+}
 
-ggsave("data/GSE48455/suppdata/PFR_median.png", width = 25, height = 20, units = "cm")
+outlierDetec(df, Main = "All") # 29 is outlier!
+df <- df[-grep("29", rownames(df)),] 
+outlierDetec(df, Main = "Without 29") # That's it!
+
+df %>% ggplot(aes(x = Times, y = PFR))+
+  geom_point(color = "grey40", alpha = 0.6)+
+  stat_smooth(aes(x = Times, y = PFR),
+              method = "lm", formula = y ~ poly(x, 3, raw = T))+
+  ggtitle("Median PFR")
+
+ggsave("data/GSE48455/suppdata/PFR_median_with_obs.png", width = 25, height = 20, units = "cm")
 
 # (IL12B/ARG1) * (median(ARG1)/median(IL12B)) - CONTROLS
 
-dfc <- cbind(control_arg1$ARG1, control_il2b)
-# dfc <- dfc %>%
-#   mutate(Ratio = IL12B / `control_arg1$ARG1`, 
-#          Correction =  median(dfc$`control_arg1$ARG1`) / median(dfc$IL12B)) %>%
-#   mutate(PFR = Ratio * Correction) %>% group_by(Times) %>% mutate(PFRmedian = median(PFR))
-# 
-# dfc[-c(7,11,23,29),] %>% ggplot()+
-#   geom_point(aes(x = Times, y = PFR))+
-#   stat_smooth(aes(x = Times, y = PFRmedian), 
-#               method = "lm", formula = y ~ poly(x, 3, raw = T))+
-#   ggtitle("Median PFR - control")
+dfc <- cbind(control_arg1$ARG1, control_il12b)
 dfc <- dfc %>%
   mutate(Ratio = IL12B / `control_arg1$ARG1`,
          Correction =  median(dfc$`control_arg1$ARG1`) / median(dfc$IL12B)) %>%
-  mutate(PFR = Ratio * Correction)
+  mutate(PFR = Ratio * Correction) %>% group_by(Times) %>% mutate(PFRm = median(PFR))
 
-dfc[-c(7,11,23,29),] %>% group_by(Times) %>% summarise(PFR = median(PFR)) %>% ggplot(aes(x = Times, y = PFR))+
-  geom_point()+stat_smooth(method = "lm", formula = y ~ poly(x, 3, raw = T))+ggtitle("Median PFR - control")
+outlierDetec(dfc) # 7 is outlier!
+dfc <- dfc[-7,]
+outlierDetec(dfc) # 10 is outlier!
+dfc <- dfc[-10,]
+outlierDetec(dfc) # 27 is outlier!
+dfc <- dfc[-27,]
+outlierDetec(dfc) # that's it!
+
+dfc %>% ggplot(aes(x = Times, y = PFR))+geom_point()+
+  stat_smooth(aes(x = Times, y = PFRm), method = "lm", 
+              formula = y ~ poly(x, 3, raw = T))+ggtitle("Median PFR - control")
+
+
+
 
 
 
@@ -147,10 +188,7 @@ congruencia.
 
 "
 
-# DOING THE SAME FOR BAUER-NORMALIZED DATA
+# ANOVA fitting to PFR
 
 
-bauer <- getGEO("GSE48455")
-bauer <- bauer$GSE48455_series_matrix.txt.gz
-exp.bauer <- exprs(bauer)
-pheno.bauer <- pData(bauer)
+

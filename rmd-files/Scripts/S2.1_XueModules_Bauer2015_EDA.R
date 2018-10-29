@@ -53,7 +53,7 @@ not_found <- ldply(not_found, rbind)
 
 
 # Ploting the Polarization Factor Ratio (PFR) by [@Buscher2017]
-
+pheno$Rows <- rownames(pheno)
 args <- grep("^ARG.*[0-9]*", rownames(genexp))
 arg1 <- args[3]
 arg2 <- args[1]
@@ -190,5 +190,28 @@ congruencia.
 
 # ANOVA fitting to PFR
 
+# build long-formatted df to compare PFR
 
+df <- data.frame(IL12B = genexp[il12b,], ARG1 = genexp[arg1,])
+df$Arrays <- rownames(df)
+df$Times <- pheno$Times
+df$Treatment <- pheno$Cy3
 
+# we replicate 0 timepoints for both treatment groups
+untreated <- df %>% filter(Times == 0)
+untreated$Treatment <- "bleomycin"
+df <- rbind(df, untreated)
+str(df)
+# convert times and treatment to factors
+df$Times <- factor(df$Times); df$Treatment <- factor(df$Treatment)
+# calculate PFR 
+df <- df %>% arrange(Treatment, Times) %>%
+      mutate(Ratio = IL12B / ARG1,
+             Correction =  mean(df$ARG1) / mean(df$IL12B), 
+             Correction.Robust = median(df$ARG1) / median(df$IL12B)) %>%
+      mutate(PFR = Ratio * Correction, 
+             PFR.Robust = Ratio * Correction.Robust) %>%
+      group_by(Times, Treatment) %>%
+      mutate(PFRm = mean(PFR), PFRm.Robust = median(PFR.Robust))
+table(df$Times)
+saveRDS(df, "data/GSE48455/suppdata/anova_table.rds")

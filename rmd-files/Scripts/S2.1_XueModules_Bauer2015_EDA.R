@@ -1,20 +1,17 @@
 library(tidyverse)
+library(plyr)
 library(stringr)
 library(TcGSA)
 library(biomaRt)
 library(dplyr)
-library(GEOquery)
-library(rafalib)
+library(limma)
 # Load Data
 setwd("/home/giulianonetto/windows/tcc/rmd-files")
 eset <- readRDS("data/GSE48455/suppdata/ExpressionSetClean.rds")
 Xue.gmt <- GSA::GSA.read.gmt("data/XueModules/genesets.gmt")
-genesets <- read.csv("data/XueModules/genesets.gmt", 
-                     sep = "\t", header = F, row.names = 1, stringsAsFactors = F)
 
-# genesets[is.na(genesets)] <- ""
 
-# Build grouping indeces
+# Build grouping indices
 
 pheno <- pData(eset)
 pheno$Rows <- rownames(pheno)
@@ -31,7 +28,16 @@ bleomycin <- pheno$Cy3 == "bleomycin"
 
 genexp <- exprs(eset)
 
-## BiomaRt Annotation fixes
+# Genesets - Map orthologs --> PYTHON
+
+system("python ~/windows/tcc/rmd-files/Scripts/S2.3_mapXueorthologs.py")
+
+# Load mapped genesets
+genesets <- read.csv("data/XueModules/genesets.rat.gmt", sep = "\t",
+                     header = F, row.names = 1, stringsAsFactors = F,
+                     na.strings = c("", " ", "NA"))
+
+# Find genes in gmt file that have no match in gene expression matrix
 
 not_found = vector("list", length = 49)
 for (i in 1:nrow(genesets)){
@@ -41,177 +47,30 @@ for (i in 1:nrow(genesets)){
   matches <- query %in% rownames(genexp)
   unmatched <- query[!matches]
   perc = round(length(unmatched)/length(query) * 100)
-  if (perc1 == perc2) {
   print(str_glue("Unmatched: {length(unmatched)} ({perc}%)"))
-  }
   if (perc < 100){
     not_found[[i]] <- unmatched
   }
 }
 not_found <- ldply(not_found, rbind)
-
-
-
-# Ploting the Polarization Factor Ratio (PFR) by [@Buscher2017]
-pheno$Rows <- rownames(pheno)
-args <- grep("^ARG.*[0-9]*", rownames(genexp))
-arg1 <- args[3]
-arg2 <- args[1]
-
-il12b <- grep("IL12.*", rownames(genexp))[1]
-
-bleo_arrays <- pheno %>% filter(Cy3 == "bleomycin" | Times == 0) %>%
-  arrange(Times) %>% dplyr::select(Rows, Times)
-control_arrays <- pheno %>% filter(Cy3 == "control") %>%
-  arrange(Times) %>% dplyr::select(Rows, Times)
-
-
-# Arg1
-
-bleo_arg1 <- data.frame(ARG1 = genexp[arg1,bleo_arrays[,1]])
-bleo_arg1 <- cbind(bleo_arg1, bleo_arrays)
-bleo_arg1 %>% group_by(Times) %>% summarise(ARG1 = median(ARG1)) %>% 
-  ggplot(aes(x = Times, y = ARG1))+geom_point()+
-  stat_smooth(method="lm", se=TRUE, fill=NA,
-              formula=y ~ poly(x, 3, raw=TRUE),colour="red")+
-  labs(title="Arg1 (bleo) - Bauer2015")
-
-control_arg1 <- data.frame(ARG1 = genexp[arg1,control_arrays[,1]])
-control_arg1 <- cbind(control_arg1, control_arrays)
-control_arg1 %>% group_by(Times) %>% summarise(ARG1 = mean(ARG1)) %>% 
-  ggplot(aes(x = Times, y = ARG1))+geom_point()+
-  stat_smooth(method="lm", se=TRUE, fill=NA,
-                            formula=y ~ poly(x, 3, raw=TRUE),colour="blue")+
-  labs(title="Arg1 (cntrl) - Bauer2015")
-
-
-# IL12b
-
-bleo_il12b <- data.frame(IL12B = genexp[il12b,bleo_arrays[,1]])
-bleo_il12b <- cbind(bleo_il12b, bleo_arrays)
-bleo_il12b %>% group_by(Times) %>% summarise(IL12B = median(IL12B)) %>% 
-  ggplot(aes(x = Times, y = IL12B))+geom_point()+
-  stat_smooth(method="lm", se=TRUE,
-              formula=y ~ poly(x, 3, raw=TRUE),colour="red")+
-  labs(title="IL12b (bleo) - Bauer2015")
-
-control_il12b <- data.frame(IL12B = genexp[il12b,control_arrays[,1]])
-control_il12b <- cbind(control_il12b, control_arrays)
-control_il12b %>% group_by(Times) %>% summarise(IL12B = mean(IL12B)) %>% 
-  ggplot(aes(x = Times, y = IL12B))+geom_point()+
-  stat_smooth(method="lm", se=TRUE,
-              formula=y ~ poly(x, 3, raw=TRUE),colour="blue")+
-  labs(title="IL12b (cntrl) - Bauer2015")
-
-# (IL12B/ARG1) * (median(ARG1)/median(IL12B)) BLEOMYCIN GROUP
-df <- cbind(bleo_arg1$ARG1,bleo_il12b)
-df <- df %>%
-  mutate(Ratio = IL12B / `bleo_arg1$ARG1`, 
-         Correction =  median(df$`bleo_arg1$ARG1`) / median(df$IL12B)) %>%
-  mutate(PFR = Ratio * Correction) %>% group_by(Times) %>% mutate(PFRm = median(PFR)) %>% as.data.frame()
-
-# -> Outliers identification functions!
-"
-Studentized residuals with Bonferonni p < 0,05:
-The car::outlierTest() function reports the Bonferroni adjusted p-value for the largest
-absolute studentized residual from your fit [@RobertKabacoff - R in Action].
-"
-ResidualsPlot <- function(Fit, title = ""){
-  res <- rstudent(Fit)
-  Residuals <- data.frame(obs = names(res), values = res) 
-  h = 3*sd(res)
-  ggplot(Residuals, aes(reorder(obs, values), values))+
-    geom_bar(stat = "identity")+
-    theme(text = element_text(family = "Decima WE", color = "grey20"), 
-          axis.text.x = element_text(angle = 90, hjust = 1))+
-    ggtitle(str_glue("Studenized Residuals {title}"))+
-    geom_hline(yintercept=c(h, -h), 
-               linetype="dashed", color = "red")+
-    geom_text(aes(0,h,label = str_glue("3 SD's ({round(h, 2)})"),
-                  hjust = -0.1, vjust = -1.15, 
-                  family = "Courier"), color = "grey40")
+rownames(not_found) <- rownames(genesets)
+# Use biomaRt!
+convert_human_gene_list <- function(x){
+  
+  mouse = useMart("ensembl", dataset = "mmusculus_gene_ensembl")
+  
+  synonims = 
+  no_matches = setdiff(x, mouse_matches[,1]) 
+  
+  x = data.frame(MGI.symbol = x)
+  df <- merge(x, mouse_matches, by = "HGNC.symbol")
+  
+  return(list(df, data.frame(no_matches)))
 }
-outlierDetec <- function(df, Main = ""){
-  rownames(df) <- paste0("Obs ", rownames(df))
-  fit <- lm(PFR ~ poly(Times, 3, raw = T), data = df)
-  outlierTest(fit) %>% print()
-  qqPlot(fit, labels=row.names(df), 
-         id.method = "identify", simulate = T, 
-         main = str_glue("Q-Q Plot {Main}"))
-  ResidualsPlot(fit, Main)
-}
+library(org.Rn.eg.db)
+alias2Symbol(not_found[3,3], species="Hs")
 
-outlierDetec(df, Main = "All") # 29 is outlier!
-df <- df[-grep("29", rownames(df)),] 
-outlierDetec(df, Main = "Without 29") # That's it!
-
-df %>% ggplot(aes(x = Times, y = PFR))+
-  geom_point(color = "grey40", alpha = 0.6)+
-  stat_smooth(aes(x = Times, y = PFR),
-              method = "lm", formula = y ~ poly(x, 3, raw = T))+
-  ggtitle("Median PFR")
-
-ggsave("data/GSE48455/suppdata/PFR_median_with_obs.png", width = 25, height = 20, units = "cm")
-
-# (IL12B/ARG1) * (median(ARG1)/median(IL12B)) - CONTROLS
-
-dfc <- cbind(control_arg1$ARG1, control_il12b)
-dfc <- dfc %>%
-  mutate(Ratio = IL12B / `control_arg1$ARG1`,
-         Correction =  median(dfc$`control_arg1$ARG1`) / median(dfc$IL12B)) %>%
-  mutate(PFR = Ratio * Correction) %>% group_by(Times) %>% mutate(PFRm = median(PFR))
-
-outlierDetec(dfc) # 7 is outlier!
-dfc <- dfc[-7,]
-outlierDetec(dfc) # 10 is outlier!
-dfc <- dfc[-10,]
-outlierDetec(dfc) # 27 is outlier!
-dfc <- dfc[-27,]
-outlierDetec(dfc) # that's it!
-
-dfc %>% ggplot(aes(x = Times, y = PFR))+geom_point()+
-  stat_smooth(aes(x = Times, y = PFRm), method = "lm", 
-              formula = y ~ poly(x, 3, raw = T))+ggtitle("Median PFR - control")
+# downloading gene_ingo from ncbi
+system("python /home/giulianonetto/windows/tcc/storage/gene_info/get_aliases.py")
 
 
-
-
-
-
-" O PFR parece nao ter distribuicao normal, alem dos dados terem muitos
-outliers. Tem que comparar o controle com a bleo e fazer wilcoxon.
-Tem que plotar com o teste. Tem que fazer o mesmo para os set de genes
-do Xue. Tem que avaliar a possibilidade de subset do dataset e de nova
-normalizacao dos PFRs. Decidir formula para PFR modular. Fazer os 
-mesmos plots com os dados tratados do bauer, so pra checar
-congruencia.
-
-"
-
-# ANOVA fitting to PFR
-
-# build long-formatted df to compare PFR
-
-df <- data.frame(IL12B = genexp[il12b,], ARG1 = genexp[arg1,])
-df$Arrays <- rownames(df)
-df$Times <- pheno$Times
-df$Treatment <- pheno$Cy3
-
-# we replicate 0 timepoints for both treatment groups
-untreated <- df %>% filter(Times == 0)
-untreated$Treatment <- "bleomycin"
-df <- rbind(df, untreated)
-str(df)
-# convert times and treatment to factors
-df$Times <- factor(df$Times); df$Treatment <- factor(df$Treatment)
-# calculate PFR 
-df <- df %>% arrange(Treatment, Times) %>%
-      mutate(Ratio = IL12B / ARG1,
-             Correction =  mean(df$ARG1) / mean(df$IL12B), 
-             Correction.Robust = median(df$ARG1) / median(df$IL12B)) %>%
-      mutate(PFR = Ratio * Correction, 
-             PFR.Robust = Ratio * Correction.Robust) %>%
-      group_by(Times, Treatment) %>%
-      mutate(PFRm = mean(PFR), PFRm.Robust = median(PFR.Robust))
-table(df$Times)
-saveRDS(df, "data/GSE48455/suppdata/anova_table.rds")

@@ -4,12 +4,12 @@ library(stringr)
 library(TcGSA)
 library(biomaRt)
 library(dplyr)
+library(Biobase)
 library(limma)
 # Load Data
 setwd("/home/giulianonetto/windows/tcc/rmd-files")
 eset <- readRDS("data/GSE48455/suppdata/ExpressionSetClean.rds")
 Xue.gmt <- GSA::GSA.read.gmt("data/XueModules/genesets.gmt")
-
 
 # Build grouping indices
 
@@ -36,10 +36,15 @@ system("python ~/windows/tcc/rmd-files/Scripts/S2.3_mapXueorthologs.py")
 genesets <- read.csv("data/XueModules/genesets.rat.gmt", sep = "\t",
                      header = F, row.names = 1, stringsAsFactors = F,
                      na.strings = c("", " ", "NA"))
+M1_M2_modules <- rownames(genesets[which(genesets$V2 %in% c("M1", "M2")),])
 
-# Find genes in gmt file that have no match in gene expression matrix
+# Get only M1- and M2-associated modules
+genesets <- genesets %>% dplyr::filter(V2 == "M1" | V2 == "M2") %>% as.data.frame()
+rownames(genesets) <- M1_M2_modules
 
-not_found = vector("list", length = 49)
+# Find genes in modules that have no match in gene expression matrix
+
+not_found = vector("list", length = 6)
 for (i in 1:nrow(genesets)){
   nas <- is.na(genesets[i,2:ncol(genesets)])
   query <- genesets[i,2:ncol(genesets)][!nas]
@@ -52,25 +57,39 @@ for (i in 1:nrow(genesets)){
     not_found[[i]] <- unmatched
   }
 }
-not_found <- ldply(not_found, rbind)
-rownames(not_found) <- rownames(genesets)
-# Use biomaRt!
-convert_human_gene_list <- function(x){
-  
-  mouse = useMart("ensembl", dataset = "mmusculus_gene_ensembl")
-  
-  synonims = 
-  no_matches = setdiff(x, mouse_matches[,1]) 
-  
-  x = data.frame(MGI.symbol = x)
-  df <- merge(x, mouse_matches, by = "HGNC.symbol")
-  
-  return(list(df, data.frame(no_matches)))
+not_found_df <- ldply(not_found, rbind)
+rownames(not_found_df) <- M1_M2_modules
+write.table(not_found_df, "data/GSE48455/suppdata/not_found.gmt",
+            row.names = T, col.names = F, sep = '\t', quote = F)
+
+# downloading and sorting gene_ingo from ncbi
+system("#python /home/giulianonetto/windows/tcc/storage/gene_info/get_aliases.py")
+
+# get aliases for not found genes 
+## output: /home/giulianonetto/windows/tcc/rmd-files/data/GSE48455/suppdata/not_found_map.gmt
+system("#/home/giulianonetto/windows/tcc/rmd-files/Scripts/S2.4_not_found_Xue_modules.py")
+
+# map aliases and Xue modules genes - delete genes not mapped
+
+aliases <- read.csv("/home/giulianonetto/windows/tcc/rmd-files/data/GSE48455/suppdata/not_found_map.gmt",
+                    sep = "\t", header = F, stringsAsFactors = F)
+# should be something like below
+not_found <- not_found %>% unlist()
+counter = 0
+for (gene in not_found){
+  query_alias = grepl(str_glue("^{gene} "), aliases$V1)
+  alias_list <- str_split(aliases[query_alias,1], " ") %>% unlist()
+  for (alias.match in alias_list){
+    if (alias.match %in% rownames(genexp)){
+      counter = counter + 1
+      pos <- which(genesets == gene, arr.ind = TRUE)
+      print(pos)
+      genesets[pos] <- alias.match
+      not_found_df
+    }
+  }
 }
-library(org.Rn.eg.db)
-alias2Symbol(not_found[3,3], species="Hs")
+coutner # got more 70 genes
 
-# downloading gene_ingo from ncbi
-system("python /home/giulianonetto/windows/tcc/storage/gene_info/get_aliases.py")
-
-
+# remove not_found genes_ref
+for ()

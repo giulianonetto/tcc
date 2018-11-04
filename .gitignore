@@ -79,3 +79,4 @@ papers/
 */tmp/*
 *.ppt*
 *.gmt
+*gene_info/

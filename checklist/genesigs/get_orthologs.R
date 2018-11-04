@@ -99,6 +99,7 @@ no_mouse_orthologs = data.frame(HGNC.symbol = biogps.humans.biomart[[2]][[1]],
                                     length(biogps.humans.biomart[[2]][[1]])))
 
 final.table = data.frame(rbind(matches_unique, no_mouse_orthologs))
+
 final.table = final.table[!duplicated(final.table$HGNC.symbol),]
 write.table(final.table, 
             "/home/giulianonetto/windows/tcc/checklist/genesigs/human_mouse.map",

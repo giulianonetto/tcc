@@ -134,10 +134,11 @@ Outliers <- rownames(pheno) %in% c("GSM1179148.B3.5", "GSM1179104.V42.4",
                                    "GSM1179124.B28.3", "GSM1179133.B7.5", "GSM1179085.B3.2")
 PCA.all <- eset@assayData$exprs %>% t() %>% prcomp()
 PCA.clean <- eset[,!Outliers]@assayData$exprs %>% t() %>% prcomp()
-colours <- scale_color_manual(values = c("deeppink", "red", "black", "blue", "green"))
-colours_Cy3 <- scale_color_manual(values = c("black", "red"))
-scales_y <- scale_y_continuous(limits=c(-0.6, 0.60))
-margins <- theme(plot.margin = unit(c(1.5, 1, 0.5, 1), "cm"))
+# ggplot stuff for pca
+{ colours <- scale_color_manual(values = c("deeppink", "red", "black", "blue", "green"))
+  colours_Cy3 <- scale_color_manual(values = c("black", "red"))
+  scales_y <- scale_y_continuous(limits=c(-0.6, 0.60))
+  margins <- theme(plot.margin = unit(c(1.5, 1, 0.5, 1), "cm"))}
 # PCA by Disease Phase
 pca.all.1.2 <- autoplot(PCA.all, x = 1, y = 2, 
                         data = pheno, colour = "Phase", 
@@ -213,3 +214,20 @@ ggsave("data/GSE48455/suppdata/qq_after.png",
        width = 20, height = 20, units = "cm")
 
 saveRDS(eset[,!Outliers], "data/GSE48455/suppdata/ExpressionSetClean.rds")
+
+
+# More PCAs colored by phase...
+
+## Eset without outliers
+
+eset <- readRDS("data/GSE48455/suppdata/ExpressionSetClean.rds")
+pheno <- pData(eset); expt <- t(exprs(eset)); rm(eset)
+{ pca <- prcomp(expt, scale. = T, center = T)
+  pca$sdev %>% plot(type="b")
+  pca %>% summary() %>% print()
+  barplot(abs(colSums(pca$x)))
+  autoplot(pca, x = 1, y = 2, 
+           data = pheno, colour = "Phase", shape = "Cy3",
+           size = 3)+colours+scales_y+margins}
+
+# rever gene expression matrix!!!

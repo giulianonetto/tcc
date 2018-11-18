@@ -127,10 +127,7 @@ ggarrange(p1, p2, nrow = 1, ncol = 2)
 ## Detection and removal of batch effects
 
   __TO-DO__ see: [@Leek2012; Li2007; Benito2004]
-# Gene Modules Assessment in IPF animal models
 
-
-  As a validation procedure, the transcription modules selected for this study were assessed in microarray data from IPF animal models.
 
 
 

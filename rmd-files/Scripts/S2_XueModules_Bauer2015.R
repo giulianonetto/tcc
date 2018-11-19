@@ -138,7 +138,8 @@ PCA.clean <- eset[,!Outliers]@assayData$exprs %>% t() %>% prcomp()
 { colours <- scale_color_manual(values = c("deeppink", "red", "black", "blue", "green"))
   colours_Cy3 <- scale_color_manual(values = c("black", "red"))
   scales_y <- scale_y_continuous(limits=c(-0.6, 0.60))
-  margins <- theme(plot.margin = unit(c(1.5, 1, 0.5, 1), "cm"))}
+  margins <- theme(plot.margin = unit(c(1.5, 1, 0.5, 1), "cm"))
+  transparency <- scale_alpha_discrete(range = c(1, 0.7))}
 # PCA by Disease Phase
 pca.all.1.2 <- autoplot(PCA.all, x = 1, y = 2, 
                         data = pheno, colour = "Phase", 
@@ -222,12 +223,42 @@ saveRDS(eset[,!Outliers], "data/GSE48455/suppdata/ExpressionSetClean.rds")
 
 eset <- readRDS("data/GSE48455/suppdata/ExpressionSetClean.rds")
 pheno <- pData(eset); expt <- t(exprs(eset)); rm(eset)
-{ pca <- prcomp(expt, scale. = T, center = T)
-  pca$sdev %>% plot(type="b")
-  pca %>% summary() %>% print()
-  barplot(abs(colSums(pca$x)))
-  autoplot(pca, x = 1, y = 2, 
-           data = pheno, colour = "Phase", shape = "Cy3",
-           size = 3)+colours+scales_y+margins}
+colnames(pheno)[4] <- "Treatment"
+pheno$Phase <- factor(pheno$Phase, labels = c("Healthy", "Injury (3-7d)", 
+                                              "Early Fibrosis (14d)", 
+                                              "Late Fibrosis (21-28d)",
+                                              "Healing (42-56d)"))
+# plot config
+{ colours <- scale_color_manual(values = c("deeppink", "red", "green", "blue", "black"))
+  colours_Cy3 <- scale_color_manual(values = c("red2", "magenta"))
+  scales_y <- scale_y_continuous(limits=c(-0.6, 0.60))
+  margins <- theme(plot.margin = unit(c(1, 0.2, 1, 2), "cm"))
+  margins_Cy3 <- theme(plot.margin = unit(c(1, 5, 1, 2), "cm"))
+  transparency <- scale_alpha_discrete(range = c(1, 0.55))
+  transparency_Cy3 <- scale_alpha_discrete(range = c(0.9, 0.9))
+  text_sizes <- theme(text = element_text(size=30))
 
-# rever gene expression matrix!!!
+# plot pca
+  pca <- prcomp(expt, scale. = F, center = F)
+  # pca$sdev %>% plot(type="b")
+  # pca %>% summary() %>% print()
+  # barplot(abs(colSums(pca$x)))
+  p1 <- autoplot(pca, x = 1, y = 2, 
+               data = pheno, colour = "Phase", shape = "Treatment",
+               size = 6, alpha = "Treatment") + colours + scales_y + margins +
+        transparency + text_sizes
+  p2 <- autoplot(pca, x = 1, y = 2, 
+                 data = pheno, colour = "Treatment",
+                 size = 6, alpha = "Treatment") + colours_Cy3 + scales_y + margins_Cy3 +
+    transparency_Cy3 + text_sizes
+  
+  
+  plots <- ggarrange(p2, p1,ncol = 1, nrow = 2, 
+                     legend = "right")
+  annotate_figure(plots, 
+                  top = text_grob("PCA - IPF animal model",
+                                  face = "bold", size = 30, 
+                                  vjust = 1))}
+# Fig: pca_bauer2015.png
+
+

@@ -92,4 +92,3 @@ for (gene in not_found){
 coutner # got more 70 genes
 
 # remove not_found genes_ref
-for ()

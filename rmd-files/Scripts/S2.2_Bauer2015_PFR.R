@@ -1,3 +1,17 @@
+library(dplyr)
+library(reshape2)
+library(ggplot2)
+library(nlme)
+library(multcomp)
+library(MASS)
+library(ggpubr)
+library(ggsignif)
+
+setwd("/home/giulianonetto/windows/tcc/rmd-files")
+eset <- readRDS("data/GSE48455/suppdata/ExpressionSetClean.rds")
+pheno <- pData(eset)
+genexp <- exprs(eset)
+
 # Ploting the Polarization Factor Ratio (PFR) by [@Buscher2017]
 pheno$Rows <- rownames(pheno)
 args <- grep("^ARG.*[0-9]*", rownames(genexp))
@@ -18,7 +32,7 @@ bleo_arg1 <- data.frame(ARG1 = genexp[arg1,bleo_arrays[,1]])
 bleo_arg1 <- cbind(bleo_arg1, bleo_arrays)
 bleo_arg1 %>% group_by(Times) %>% summarise(ARG1 = median(ARG1)) %>% 
   ggplot(aes(x = Times, y = ARG1))+geom_point()+
-  stat_smooth(method="lm", se=TRUE, fill=NA,
+  stat_smooth(method="lm", se = TRUE,
               formula=y ~ poly(x, 3, raw=TRUE),colour="red")+
   labs(title="Arg1 (bleo) - Bauer2015")
 
@@ -55,39 +69,40 @@ df <- df %>%
   mutate(Ratio = IL12B / `bleo_arg1$ARG1`, 
          Correction =  median(df$`bleo_arg1$ARG1`) / median(df$IL12B)) %>%
   mutate(PFR = Ratio * Correction) %>% group_by(Times) %>% mutate(PFRm = median(PFR)) %>% as.data.frame()
+{
+  # -> Outliers identification functions!
+  "
+  Studentized residuals with Bonferonni p < 0,05:
+  The car::outlierTest() function reports the Bonferroni adjusted p-value for the largest
+  absolute studentized residual from your fit [@RobertKabacoff - R in Action].
+  "
+  ResidualsPlot <- function(Fit, title = ""){
+    res <- rstudent(Fit)
+    Residuals <- data.frame(obs = names(res), values = res) 
+    h = 2*sd(res)
+    ggplot(Residuals, aes(reorder(obs, values), values))+
+      geom_bar(stat = "identity")+
+      theme(text = element_text(family = "Decima WE", color = "grey20"), 
+            axis.text.x = element_text(angle = 90, hjust = 1))+
+      ggtitle(str_glue("Studenized Residuals {title}"))+
+      geom_hline(yintercept=c(h, -h), 
+                 linetype="dashed", color = "red")+
+      geom_text(aes(0,h,label = str_glue("2 SD's ({round(h, 2)})"),
+                    hjust = -0.1, vjust = -1.15, 
+                    family = "Courier"), color = "grey40")
+  }
+  outlierDetec <- function(df, Main = ""){
+    df <- as.data.frame(df)
+    rownames(df) <- paste0("Obs ", rownames(df))
+    fit <- lm(PFR ~ poly(as.numeric(Times), 3, raw = T) * Treatment, data = df)
+    outlierTest(fit) %>% print()
+    qqPlot(fit, labels=row.names(df), 
+           id.method = "identify", simulate = T, 
+           main = str_glue("Q-Q Plot {Main}"))
+    ResidualsPlot(fit, Main)
+  }
 
-# -> Outliers identification functions!
-"
-Studentized residuals with Bonferonni p < 0,05:
-The car::outlierTest() function reports the Bonferroni adjusted p-value for the largest
-absolute studentized residual from your fit [@RobertKabacoff - R in Action].
-"
-ResidualsPlot <- function(Fit, title = ""){
-  res <- rstudent(Fit)
-  Residuals <- data.frame(obs = names(res), values = res) 
-  h = 2*sd(res)
-  ggplot(Residuals, aes(reorder(obs, values), values))+
-    geom_bar(stat = "identity")+
-    theme(text = element_text(family = "Decima WE", color = "grey20"), 
-          axis.text.x = element_text(angle = 90, hjust = 1))+
-    ggtitle(str_glue("Studenized Residuals {title}"))+
-    geom_hline(yintercept=c(h, -h), 
-               linetype="dashed", color = "red")+
-    geom_text(aes(0,h,label = str_glue("2 SD's ({round(h, 2)})"),
-                  hjust = -0.1, vjust = -1.15, 
-                  family = "Courier"), color = "grey40")
 }
-outlierDetec <- function(df, Main = ""){
-  df <- as.data.frame(df)
-  rownames(df) <- paste0("Obs ", rownames(df))
-  fit <- lm(PFR ~ poly(as.numeric(Times), 3, raw = T) * Treatment, data = df)
-  outlierTest(fit) %>% print()
-  qqPlot(fit, labels=row.names(df), 
-         id.method = "identify", simulate = T, 
-         main = str_glue("Q-Q Plot {Main}"))
-  ResidualsPlot(fit, Main)
-}
-
 outlierDetec(df, Main = "All") # 29 is outlier!
 df <- df[-grep("29", rownames(df)),] 
 outlierDetec(df, Main = "Without 29") # That's it!
@@ -146,7 +161,7 @@ df <- data.frame(IL12B = genexp[il12b,], ARG1 = genexp[arg1,])
 df$Arrays <- rownames(df)
 df$Times <- pheno$Times
 df$Treatment <- pheno$Cy3
-
+df <- df[,c(3,1,2,4,5)]; rownames(df) <- 1:nrow(df)
 # we replicate 0 timepoints for both treatment groups
 untreated <- df %>% filter(Times == 0)
 untreated$Treatment <- "bleomycin"
@@ -172,7 +187,7 @@ df <- df[-41,]
 outlierDetec(df, Main = "Poly(Times) * Treatment") # 44 is outlier
 df <- df[-44,]
 outlierDetec(df, Main = "Poly(Times) * Treatment") # 61 is outlier
-df<- df[-61,]
+df <- df[-61,]
 outlierDetec(df, Main = "Poly(Times) * Treatment") # 55 is outlier
 df <- df[-55,]
 outlierDetec(df, Main = "Poly(Times) * Treatment") # 62 is outlier
@@ -180,10 +195,47 @@ df <- df[-62,]
 outlierDetec(df, Main = "Poly(Times) * Treatment") # 54 is outlier
 df <- df[-54,]
 outlierDetec(df, Main = "Poly(Times) * Treatment") # That's it!
+# 
+# df.bleo <- df %>% filter(Treatment == "bleomycin")
+# df.ctrl <- df %>% filter(Treatment == "control")
+# df.bleo %>% as.data.frame() %>% filter(Times == 14) %>% select(PFR) %>% unlist()
+# df.bleo <- df.bleo[-c(15,18,29,33),] %>% as.data.frame()
+# df.ctrl <- df.ctrl %>% as.data.frame()
 
+df$Rat <- paste0(toupper(str_extract(df$Treatment, "\\w")), 
+                 str_extract(str_split(df$Arrays, "\\.",simplify = T)[,2],"[0-9]+"))
+BleovsCtrl <- c(1,0)
+contrasts(df$Treatment) <- BleovsCtrl
+contrasts(df$Times) <- contrasts(df$Times)
 
-df.bleo <- df %>% filter(Treatment == "bleomycin")
-df.ctrl <- df %>% filter(Treatment == "control")
-df.bleo %>% as.data.frame() %>% filter(Times == 14) %>% select(PFR) %>% unlist()
-df.bleo <- df.bleo[-c(15,18,29,33),] %>% as.data.frame()
-df.ctrl <- df.ctrl %>% as.data.frame()
+baseline <- lme(PFR ~ 1, random = ~1|Rat/Times, 
+                data = df, method = "ML")
+treats <- update(baseline, .~. + Treatment)
+treats_and_times <- update(treats, .~. + Times)
+final_fit <- update(treats_and_times, .~. + Treatment:Times)
+
+anova(baseline, treats, treats_and_times, final_fit) # only treatment significant
+
+bartlett.test(PFR ~ Treatment, data = df)
+t.test(PFR ~ Treatment, data = df, var.equal = TRUE, conf.level=0.95)
+wilcox.test(PFR ~ Treatment, data = df, conf.level = 0.95)
+wilcox_test(PFR ~ Treatment, data = df, distribution = "exact")
+
+dftoplot <- df
+dftoplot$Times <- dftoplot$Times %>% levels %>% as.numeric()
+{
+  p1 <- dftoplot %>% ggplot(aes(x = Times, y = PFR, group = Treatment)) +
+          geom_point(aes(color = Treatment), size = 3, alpha = 0.3) +
+          geom_smooth(aes(color = Treatment), method = "glm")+
+          xlab("Days after treatment")+
+          theme(text = element_text(size = 20))
+  
+  p2 <- dftoplot %>% ggplot(aes(x = Treatment, y = PFR, group = Treatment)) +
+          geom_boxplot(aes(color = Treatment)) +
+          geom_smooth(aes(color = Treatment), method = "lm") +
+          # stat_compare_means(comparisons = list(c("bleomycin", "control")))
+          geom_signif(comparisons = list(c("bleomycin", "control")),
+                      map_signif_level = TRUE, tip_length = 0) +
+          theme(text = element_text(size = 20))
+  ggarrange(p1, p2, nrow = 1, ncol = 2, 
+            common.legend = T, legend = "right") }

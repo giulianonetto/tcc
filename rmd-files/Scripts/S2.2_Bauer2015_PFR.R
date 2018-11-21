@@ -1,144 +1,61 @@
-library(dplyr)
-library(reshape2)
-library(ggplot2)
-library(nlme)
-library(multcomp)
-library(MASS)
-library(ggpubr)
-library(ggsignif)
 
-setwd("/home/giulianonetto/windows/tcc/rmd-files")
-eset <- readRDS("data/GSE48455/suppdata/ExpressionSetClean.rds")
-pheno <- pData(eset)
-genexp <- exprs(eset)
-
-# Ploting the Polarization Factor Ratio (PFR) by [@Buscher2017]
-pheno$Rows <- rownames(pheno)
-args <- grep("^ARG.*[0-9]*", rownames(genexp))
-arg1 <- args[3]
-arg2 <- args[1]
-
-il12b <- grep("IL12.*", rownames(genexp))[1]
-
-bleo_arrays <- pheno %>% filter(Cy3 == "bleomycin" | Times == 0) %>%
-  arrange(Times) %>% dplyr::select(Rows, Times)
-control_arrays <- pheno %>% filter(Cy3 == "control") %>%
-  arrange(Times) %>% dplyr::select(Rows, Times)
-
-
-# Arg1
-
-bleo_arg1 <- data.frame(ARG1 = genexp[arg1,bleo_arrays[,1]])
-bleo_arg1 <- cbind(bleo_arg1, bleo_arrays)
-bleo_arg1 %>% group_by(Times) %>% summarise(ARG1 = median(ARG1)) %>% 
-  ggplot(aes(x = Times, y = ARG1))+geom_point()+
-  stat_smooth(method="lm", se = TRUE,
-              formula=y ~ poly(x, 3, raw=TRUE),colour="red")+
-  labs(title="Arg1 (bleo) - Bauer2015")
-
-control_arg1 <- data.frame(ARG1 = genexp[arg1,control_arrays[,1]])
-control_arg1 <- cbind(control_arg1, control_arrays)
-control_arg1 %>% group_by(Times) %>% summarise(ARG1 = mean(ARG1)) %>% 
-  ggplot(aes(x = Times, y = ARG1))+geom_point()+
-  stat_smooth(method="lm", se=TRUE, fill=NA,
-              formula=y ~ poly(x, 3, raw=TRUE),colour="blue")+
-  labs(title="Arg1 (cntrl) - Bauer2015")
-
-
-# IL12b
-
-bleo_il12b <- data.frame(IL12B = genexp[il12b,bleo_arrays[,1]])
-bleo_il12b <- cbind(bleo_il12b, bleo_arrays)
-bleo_il12b %>% group_by(Times) %>% summarise(IL12B = median(IL12B)) %>% 
-  ggplot(aes(x = Times, y = IL12B))+geom_point()+
-  stat_smooth(method="lm", se=TRUE,
-              formula=y ~ poly(x, 3, raw=TRUE),colour="red")+
-  labs(title="IL12b (bleo) - Bauer2015")
-
-control_il12b <- data.frame(IL12B = genexp[il12b,control_arrays[,1]])
-control_il12b <- cbind(control_il12b, control_arrays)
-control_il12b %>% group_by(Times) %>% summarise(IL12B = mean(IL12B)) %>% 
-  ggplot(aes(x = Times, y = IL12B))+geom_point()+
-  stat_smooth(method="lm", se=TRUE,
-              formula=y ~ poly(x, 3, raw=TRUE),colour="blue")+
-  labs(title="IL12b (cntrl) - Bauer2015")
-
-# (IL12B/ARG1) * (median(ARG1)/median(IL12B)) BLEOMYCIN GROUP
-df <- cbind(bleo_arg1$ARG1,bleo_il12b)
-df <- df %>%
-  mutate(Ratio = IL12B / `bleo_arg1$ARG1`, 
-         Correction =  median(df$`bleo_arg1$ARG1`) / median(df$IL12B)) %>%
-  mutate(PFR = Ratio * Correction) %>% group_by(Times) %>% mutate(PFRm = median(PFR)) %>% as.data.frame()
 {
-  # -> Outliers identification functions!
-  "
-  Studentized residuals with Bonferonni p < 0,05:
-  The car::outlierTest() function reports the Bonferroni adjusted p-value for the largest
-  absolute studentized residual from your fit [@RobertKabacoff - R in Action].
-  "
+  library(dplyr)
+  library(reshape2)
+  library(ggplot2)
+  library(stringr)
+  library(nlme)
+  library(car)
+  library(coin)
+  library(multcomp)
+  library(MASS)
+  library(ggpubr)
+  library(ggsignif)
+  setwd("/home/giulianonetto/windows/tcc/rmd-files")
+  eset <- readRDS("data/GSE48455/suppdata/ExpressionSetClean.rds")
+  pheno <- pData(eset)
+  genexp <- exprs(eset)
+  
+  # Ploting the Polarization Factor Ratio (PFR) by [@Buscher2017]
+  pheno$Rows <- rownames(pheno)
+  args <- grep("^ARG.*[0-9]*", rownames(genexp))
+  arg1 <- args[3]
+  il12b <- grep("IL12.*", rownames(genexp))[1]
+}
+
+{
+    # -> Outliers identification functions!
+    "
+    Studentized residuals with Bonferonni p < 0,05:
+    The car::outlierTest() function reports the Bonferroni adjusted p-value for the largest
+    absolute studentized residual from your fit [@RobertKabacoff - R in Action].
+    "
   ResidualsPlot <- function(Fit, title = ""){
     res <- rstudent(Fit)
-    Residuals <- data.frame(obs = names(res), values = res) 
+    Residuals <- data.frame(obs = names(res), values = res)
     h = 2*sd(res)
     ggplot(Residuals, aes(reorder(obs, values), values))+
       geom_bar(stat = "identity")+
-      theme(text = element_text(family = "Decima WE", color = "grey20"), 
+      theme(text = element_text(family = "Decima WE", color = "grey20"),
             axis.text.x = element_text(angle = 90, hjust = 1))+
       ggtitle(str_glue("Studenized Residuals {title}"))+
-      geom_hline(yintercept=c(h, -h), 
+      geom_hline(yintercept=c(h, -h),
                  linetype="dashed", color = "red")+
       geom_text(aes(0,h,label = str_glue("2 SD's ({round(h, 2)})"),
-                    hjust = -0.1, vjust = -1.15, 
+                    hjust = -0.1, vjust = -1.15,
                     family = "Courier"), color = "grey40")
   }
   outlierDetec <- function(df, Main = ""){
     df <- as.data.frame(df)
     rownames(df) <- paste0("Obs ", rownames(df))
-    fit <- lm(PFR ~ poly(as.numeric(Times), 3, raw = T) * Treatment, data = df)
+    fit <- lm(PFR ~ poly(as.numeric(as.character(Times)), 3, raw = T) * Treatment, data = df)
     outlierTest(fit) %>% print()
-    qqPlot(fit, labels=row.names(df), 
-           id.method = "identify", simulate = T, 
+    qqPlot(fit, labels = row.names(mydat),
+           id.method = "identify", simulate = T,
            main = str_glue("Q-Q Plot {Main}"))
     ResidualsPlot(fit, Main)
   }
-
 }
-outlierDetec(df, Main = "All") # 29 is outlier!
-df <- df[-grep("29", rownames(df)),] 
-outlierDetec(df, Main = "Without 29") # That's it!
-
-df %>% ggplot(aes(x = Times, y = PFR))+
-  geom_point(color = "grey40", alpha = 0.6)+
-  stat_smooth(aes(x = Times, y = PFR),
-              method = "lm", formula = y ~ poly(x, 3, raw = T))+
-  ggtitle("Median PFR")
-
-ggsave("data/GSE48455/suppdata/PFR_median_with_obs.png", width = 25, height = 20, units = "cm")
-
-# (IL12B/ARG1) * (median(ARG1)/median(IL12B)) - CONTROLS
-
-dfc <- cbind(control_arg1$ARG1, control_il12b)
-dfc <- dfc %>%
-  mutate(Ratio = IL12B / `control_arg1$ARG1`,
-         Correction =  median(dfc$`control_arg1$ARG1`) / median(dfc$IL12B)) %>%
-  mutate(PFR = Ratio * Correction) %>% group_by(Times) %>% mutate(PFRm = median(PFR))
-
-outlierDetec(dfc) # 7 is outlier!
-dfc <- dfc[-7,]
-outlierDetec(dfc) # 10 is outlier!
-dfc <- dfc[-10,]
-outlierDetec(dfc) # 27 is outlier!
-dfc <- dfc[-27,]
-outlierDetec(dfc) # that's it!
-
-dfc %>% ggplot(aes(x = Times, y = PFR))+geom_point()+
-  stat_smooth(aes(x = Times, y = PFRm), method = "lm", 
-              formula = y ~ poly(x, 3, raw = T))+ggtitle("Median PFR - control")
-
-
-
-
-
 
 " O PFR parece nao ter distribuicao normal, alem dos dados terem muitos
 outliers. Tem que comparar o controle com a bleo e fazer wilcoxon.
@@ -149,14 +66,10 @@ mesmos plots com os dados tratados do bauer, so pra checar
 congruencia.
 
 "
-
-
-
-
 # ANOVA fitting to PFR
 
 # build long-formatted df to compare PFR
-
+{
 df <- data.frame(IL12B = genexp[il12b,], ARG1 = genexp[arg1,])
 df$Arrays <- rownames(df)
 df$Times <- pheno$Times
@@ -195,35 +108,36 @@ df <- df[-62,]
 outlierDetec(df, Main = "Poly(Times) * Treatment") # 54 is outlier
 df <- df[-54,]
 outlierDetec(df, Main = "Poly(Times) * Treatment") # That's it!
-# 
-# df.bleo <- df %>% filter(Treatment == "bleomycin")
-# df.ctrl <- df %>% filter(Treatment == "control")
-# df.bleo %>% as.data.frame() %>% filter(Times == 14) %>% select(PFR) %>% unlist()
-# df.bleo <- df.bleo[-c(15,18,29,33),] %>% as.data.frame()
-# df.ctrl <- df.ctrl %>% as.data.frame()
 
-df$Rat <- paste0(toupper(str_extract(df$Treatment, "\\w")), 
-                 str_extract(str_split(df$Arrays, "\\.",simplify = T)[,2],"[0-9]+"))
-BleovsCtrl <- c(1,0)
-contrasts(df$Treatment) <- BleovsCtrl
-contrasts(df$Times) <- contrasts(df$Times)
+} 
 
-baseline <- lme(PFR ~ 1, random = ~1|Rat/Times, 
-                data = df, method = "ML")
-treats <- update(baseline, .~. + Treatment)
-treats_and_times <- update(treats, .~. + Times)
-final_fit <- update(treats_and_times, .~. + Treatment:Times)
 
-anova(baseline, treats, treats_and_times, final_fit) # only treatment significant
-
-bartlett.test(PFR ~ Treatment, data = df)
-t.test(PFR ~ Treatment, data = df, var.equal = TRUE, conf.level=0.95)
-wilcox.test(PFR ~ Treatment, data = df, conf.level = 0.95)
-wilcox_test(PFR ~ Treatment, data = df, distribution = "exact")
-
-dftoplot <- df
-dftoplot$Times <- dftoplot$Times %>% levels %>% as.numeric()
 {
+  df$Rat <- paste0(toupper(str_extract(df$Treatment, "\\w")), 
+                   str_extract(str_split(df$Arrays, "\\.",simplify = T)[,2],"[0-9]+"))
+  BleovsCtrl <- c(1,0)
+  contrasts(df$Treatment) <- BleovsCtrl
+  contrasts(df$Times) <- contrasts(df$Times)
+  
+  baseline <- lme(PFR ~ 1, random = ~1|Rat/Times, 
+                  data = df, method = "ML")
+  treats <- update(baseline, .~. + Treatment)
+  treats_and_times <- update(treats, .~. + Times)
+  final_fit <- update(treats_and_times, .~. + Treatment:Times)
+  
+  # only treatment significant
+  anova(baseline, treats, treats_and_times, final_fit)
+  
+  bartlett.test(PFR ~ Treatment, data = df)
+  t.test(PFR ~ Treatment, data = df, var.equal = TRUE, conf.level=0.95)
+  wilcox.test(PFR ~ Treatment, data = df, conf.level = 0.95)
+  wilcox_test(PFR ~ Treatment, data = df, distribution = "exact")
+}
+
+{
+  dftoplot <- df
+  dftoplot$Times <- dftoplot$Times %>% levels %>% as.numeric()
+
   p1 <- dftoplot %>% ggplot(aes(x = Times, y = PFR, group = Treatment)) +
           geom_point(aes(color = Treatment), size = 3, alpha = 0.3) +
           geom_smooth(aes(color = Treatment), method = "glm")+
@@ -239,3 +153,106 @@ dftoplot$Times <- dftoplot$Times %>% levels %>% as.numeric()
           theme(text = element_text(size = 20))
   ggarrange(p1, p2, nrow = 1, ncol = 2, 
             common.legend = T, legend = "right") }
+
+
+# Build PFR for other genes
+
+get_pfr_table <- function(exp, pheno, m1, m2){
+  mydat <- data.frame(M1 = exp[m1,], M2 = exp[m2,])
+  mydat$Arrays <- rownames(mydat)
+  mydat$Times <- pheno$Times
+  mydat$Treatment <- pheno$Cy3
+  mydat <- mydat[,c(3,1,2,4,5)]; rownames(mydat) <- 1:nrow(mydat)
+  mydat <- mydat %>% arrange(Treatment, Times) %>%
+    mutate(Ratio = M1 / M2,
+           Correction =  mean(mydat$M2) / mean(mydat$M1), 
+           Correction.Robust = median(mydat$M2) / median(mydat$M1)) %>%
+    mutate(PFR = Ratio * Correction, 
+           PFR.Robust = Ratio * Correction.Robust) %>%
+    group_by(Times, Treatment) %>%
+    mutate(PFRm = mean(PFR), PFRm.Robust = median(PFR.Robust))
+  mydat$Times <- factor(mydat$Times); mydat$Treatment <- factor(mydat$Treatment)
+  return(mydat)
+}
+
+outlierDetec <- function(mydat, Main = ""){
+  mydat <- as.data.frame(mydat)
+  rownames(mydat) <- paste0("Obs ", rownames(mydat))
+  fit <- lm(PFR ~ poly(as.numeric(as.character(Times)), 3, raw = T) * Treatment,
+            data = mydat)
+  outlierTest(fit) %>% print()
+  qqPlot(fit, id.method = "identify", simulate = T,
+         main = str_glue("Q-Q Plot {Main}"))
+  ResidualsPlot(fit, Main)
+}
+
+# relevant genes - test for outliers
+{
+inos <- grep("^NOS2.*", rownames(genexp))
+genexp[inos[1],] <- apply(genexp[inos,], 2, median) 
+mydat <- get_pfr_table(genexp, pheno = pheno, inos[1], arg1)
+outlierDetec(mydat = mydat, Main = "all")
+mydat <- mydat[-38,]
+outlierDetec(mydat = mydat, Main = "-38")
+mydat <- mydat[-41,]
+outlierDetec(mydat = mydat, Main = "-41")
+mydat <- mydat[-c(58,52),]
+outlierDetec(mydat = mydat, Main = "-58 e 52")
+mydat <- mydat[-c(53,39),]
+outlierDetec(mydat = mydat, Main = "-53 e 39")
+mydat <- mydat[-57,]
+outlierDetec(mydat = mydat, Main = "-57")
+}
+
+mydat$Rat <- paste0(toupper(str_extract(mydat$Treatment, "\\w")), 
+                 str_extract(str_split(mydat$Arrays, "\\.",simplify = T)[,2],"[0-9]+"))
+BleovsCtrl <- c(1,0)
+contrasts(mydat$Treatment) <- BleovsCtrl
+contrasts(mydat$Times) <- contrasts(mydat$Times)
+print(contrasts(mydat$Treatment))
+print(contrasts(mydat$Times))
+baseline <- lme(PFR ~ 1, random = ~1|Rat/Times, 
+                data = mydat, method = "ML")
+treats <- update(baseline, .~. + Treatment)
+treats_and_times <- update(treats, .~. + Times)
+interaction_treat_and_times <- update(treats_and_times, .~. + Treatment:Times)
+
+anova(baseline, treats, treats_and_times)  # only treatment significant
+bartlett.test(PFR ~ Treatment, data = mydat)
+t.test(PFR ~ Treatment, data = mydat, var.equal = TRUE, conf.level=0.95)
+wilcox.test(PFR ~ Treatment, data = mydat, conf.level = 0.95)
+wilcox_test(PFR ~ Treatment, data = mydat, distribution = "exact") 
+# p = 4,335e-07 for PFR = NOS2/arg1 3,932e-07
+
+dftoplot <- mydat
+dftoplot$Times <- dftoplot$Times %>% as.character() %>% as.numeric()
+{
+  p3 <- dftoplot %>% ggplot(aes(x = Times, y = PFR, group = Treatment)) +
+    geom_point(aes(color = Treatment), size = 3, alpha = 0.3) +
+    geom_smooth(aes(color = Treatment), method = "glm")+
+    xlab("Days after treatment")+
+    theme(text = element_text(size = 20))
+  
+  p4 <- dftoplot %>% ggplot(aes(x = Treatment, y = PFR, group = Treatment)) +
+    geom_boxplot(aes(color = Treatment)) +
+    geom_smooth(aes(color = Treatment), method = "lm") +
+    # stat_compare_means(comparisons = list(c("bleomycin", "control")))
+    geom_signif(comparisons = list(c("bleomycin", "control")),
+                map_signif_level = TRUE, tip_length = 0) +
+    theme(text = element_text(size = 20))
+
+}
+
+# Set common legends
+{
+p1b <- p1 + theme(axis.title.x = element_blank()) + 
+            ylab("PFR (IL12b / Arg1)")
+p2b <- p2 + theme(axis.title = element_blank())
+p3b <- p3 + ylab("PFR (iNOS / Arg1)")
+p4b <- p4 + theme(axis.title.y = element_blank())
+
+ggarrange(p1b, p2b, p3b, p4b, nrow = 2, ncol = 2, common.legend = T, 
+          legend = "right") + xlab("")
+}
+# ** is p=0.007983 and *** is p=4,335e-07
+

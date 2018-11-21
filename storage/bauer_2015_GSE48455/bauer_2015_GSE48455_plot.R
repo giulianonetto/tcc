@@ -1,4 +1,5 @@
-#  load(".RData")
+setwd("/home/giulianonetto/windows/tcc/storage/bauer_2015_GSE48455")
+load(".RData")
 library(maSigPro)
 library(rafalib)
 

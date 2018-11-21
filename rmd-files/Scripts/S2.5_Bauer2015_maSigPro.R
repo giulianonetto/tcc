@@ -75,12 +75,16 @@ clusters.df <- clusters$cut %>% as.data.frame()
 clusters.df$genes <- rownames(clusters.df); rownames(clusters.df) <- NULL
 
 hcluster <- see.genes(sigs$sig.genes$BleomycinvsControl, show.fit = T, dis = design$dis,
-                      cluster.method = "hclust")
+                      cluster.method = "hclust", legend = F)
 
 # Plot Genes 
 {
-  genes.names <- c("Cd80", "Cd86", "Cd68", "Ccl2", "Ccl12", "Ccl17", "Ccl22", "Ccl22_1", "Ccl24", "Ccl7", "Ccl7_1", "Cxcl12",
-             "Tgfb3", "Il1b", "Il24", "Il15", "Il33_1", "Il13ra2", "Il13ra1_3", "Nostrin")
+  genes.names <- c("Cd80", "Cd86", "Cd68", "Ccl2", "Ccl12", "Ccl17", "Ccl22", "Ccl22_1", 
+                   "Ccl24", "Ccl7", "Ccl7_1", "Cxcl12", "Fcer1a", "Ms4a2_1",
+                   "Tgfb3", "Il1b", "Il24", "Il15", "Il33_1", "Il13ra2", "Il13ra1_3", 
+                   "Nostrin", "Mmp23", "Mmp7", "Mmp14", "Mmp19_1",  "Mmp12", 
+                   "Mmp2_1", "Lbp", "Il1rl1_1", "C1qtnf9", "Mcpt2", "Mcpt8l3",
+                   "Tgfbi_1")
   genes.groups <- data.frame(Clusters = hcluster$cut[which(names(hcluster$cut) %in% genes.names)])
   genes <- genexp[which(rownames(genexp) %in% genes.names),]
   
@@ -88,9 +92,9 @@ hcluster <- see.genes(sigs$sig.genes$BleomycinvsControl, show.fit = T, dis = des
     main = str_glue("{g} - cluster {genes.groups[g,]}")
     png(str_glue("Development_files/figure-docx/masigpro/{g}.png"))
     PlotGroups(genes[g,], edesign = design$edesign, show.fit = T,
-               dis = design$dis, groups.vector = design$groups.vector, main = main)
+               dis = design$dis, groups.vector = design$groups.vector, 
+               main = main, legend = F)
     dev.off()
   }
 
 }
-

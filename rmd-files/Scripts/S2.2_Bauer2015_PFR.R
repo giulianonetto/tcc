@@ -119,14 +119,14 @@ outlierDetec(df, Main = "Poly(Times) * Treatment") # That's it!
   contrasts(df$Treatment) <- BleovsCtrl
   contrasts(df$Times) <- contrasts(df$Times)
   
-  baseline <- lme(PFR ~ 1, random = ~1|Rat/Times, 
-                  data = df, method = "ML")
-  treats <- update(baseline, .~. + Treatment)
-  treats_and_times <- update(treats, .~. + Times)
-  final_fit <- update(treats_and_times, .~. + Treatment:Times)
+  # test
+  baseline <- lme(PFR ~ 1, random = ~1|Rat/Times, data = df, method = "ML")
+  times <- update(baseline, .~. + Times)
+  times_and_treats <- update(times, .~. + Treatment)
+  interactions <- update(times_and_treats, .~. + Times:Treatment)
   
   # only treatment significant
-  anova(baseline, treats, treats_and_times, final_fit)
+  anova(baseline, times, times_and_treats, interactions)
   
   bartlett.test(PFR ~ Treatment, data = df)
   t.test(PFR ~ Treatment, data = df, var.equal = TRUE, conf.level=0.95)

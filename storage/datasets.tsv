@@ -1,60 +1,60 @@
 author	year	geo	organism	tissue	treatment	technology	brand	time-series	raw	observations
-Chen	2003	GSE485								
-Gimino	2004	GSE2018								
-Pardo	2005	GSE2052								
-Haston	2005	GSE85411								
-Brass	2007	GSE8553								
-Boon	2009	GSE11665								
-Bauer	2009	GSE8504								
-Vuga	2009	GSE10921								
-Scotton	2009	GSE16846								
-Rajkumar	2010	GSE15197								
-Pandit	2010	GSE13316								
-EmblomCallahan	2010	GSE17978								
-Wynn	2011	GSE27721								
-Cho	2011	GSE21369								
-Sellamuthu	2011	GSE30216								
-Meltzer	2011	GSE24206								
-Xie	2011	GSE24323								
+Chen	2003	GSE485	mice							
+Gimino	2004	GSE2018	human							
+Pardo	2005	GSE2052	human	lung	ipf	biosciences				
+Haston	2005	GSE85411	mice							
+Brass	2007	GSE8553	mice							
+Boon	2009	GSE11665	human	lung	ipf	sage				
+Bauer	2009	GSE8504	mice							
+Vuga	2009	GSE10921	human	Fibroblasts – lung cells		CodeLink				
+Scotton	2009	GSE16846	mice							
+Rajkumar	2010	GSE15197	human	lung	Ipf – PAH	microarray	agilent			
+Pandit	2010	GSE13316	human	miRNA lng						
+EmblomCallahan	2010	GSE17978	human	Fibroblasts – lung cells						
+Wynn	2011	GSE27721	mice							
+Cho	2011	GSE21369	human	lung	ILG	microarray	affymetrix			
+Sellamuthu	2011	GSE30216	mice/human	lung/A549						
+Meltzer	2011	GSE24206	human	lung	ipf	microarray	affymetrix			
+Xie	2011	GSE24323	mice							
 Orozco	2012	GSE38705	mice	Macrophages	lpsVSoxpapcVScontrol	microarray	affymetrix	no	yes	cited by Buscher, 2017; Codoni, 2016
 Sears	2012	GSE27002,	human	bal cells	smokers	microarray	affymetrix	no	yes	cited by Buscher, 2017
 Reynier	2012	GSE40885	human	bal cells	lps	microarray	affymetrix	no	yes	cited by Buscher, 2017
-Yang	2012	GSE33566								
-DAlessandroGabazza	2012	GSE28122								
-Sellamuthu	2012	GSE36208								
-Milosevic	2012	GSE27430								
-HerazoMaya	2013	GSE28221								
-Peng	2013	GSE40151								
-Blaauboer	2013	GSE37635								
-Cabrera	2013	GSE42301								
-Tsukui	2013	GSE42564								
-Rosas	2013	GSE49072								
-Honeyman	2013	GSE45789								
-HerazoMaya	2013	GSE27957								
-Peng	2013	GSE44723								
-Sellamuthu	2013	GSE32147								
-Lindahl	2013	GSE40839								
-Ni	2014	GSE54463								
-Xue	2014	GSE47189								
-Bauer	2015	GSE47460								
-DePianto	2015	GSE53845								
-Sontake	2015	GSE66634								
+Yang	2012	GSE33566	human	blood	ipf	microarray	agilent			
+DAlessandroGabazza	2012	GSE28122	mice							
+Sellamuthu	2012	GSE36208	rat		silica					
+Milosevic	2012	GSE27430	human	Non-codingRNA						
+HerazoMaya	2013	GSE28221	human	blood						
+Peng	2013	GSE40151	mice							
+Blaauboer	2013	GSE37635	mice							
+Cabrera	2013	GSE42301	mice							
+Tsukui	2013	GSE42564	mice							
+Rosas	2013	GSE49072	human	Macrophages	ipfFAMILYipfREGULAR	microarray	affymetrix			
+Honeyman	2013	GSE45789	mice							
+HerazoMaya	2013	GSE27957	human	pbmc						
+Peng	2013	GSE44723	rat	Fibroblasts – lung cells						
+Sellamuthu	2013	GSE32147	rat							
+Lindahl	2013	GSE40839	human	Fibroblasts – lung cells						
+Ni	2014	GSE54463	mice							
+Xue	2014	GSE47189	human	XUE E TAL						
+Bauer	2015	GSE47460	human	lung	ILDvsCTRLvsCOPD					
+DePianto	2015	GSE53845	human	lung	IpvsCOTRL	microarray	agilent			
+Sontake	2015	GSE66634	mice							
 Bauer	2015	GSE48455	rat	lung	bleomycin	microarray	agilent	yes	yes	
-Huang	2015	GSE38958								
-Geng	2015	GSE72073								
-Shichino	2015	GSE61709								
-Chanda	2016	GSE73854								
-Xu	2016	GSE86618								
-Xu	2016	GSE94555								
-Peng	2016	GSE47460	human	lung	ipf	microarray	agilent	no	yes	Bauer, 2015a
-Marwick	2016	GSE90010								
-Morrel	2017	GSE89953								
-Umbright	2017	GSE49144								
-XLv	2017	GSE77326								
-Liu	2017	GSE98468								
-Xi	2017	GSE83501								
-Vukmirovic	2017	GSE83717								
-Schafer	2017	GSE92592								
+Huang	2015	GSE38958	human	pbmc		microarray	affymetrix			
+Geng	2015	GSE72073	human	lung	IPFvsCTRL	microarray	affymetrix			
+Shichino	2015	GSE61709	mice							
+Chanda	2016	GSE73854	human	mesemchymal stromal cells	progressiveIPFvsSTABLEipf	microarray	affymetrix			
+Xu	2016	GSE86618	human			single rnaseq				
+Xu	2016	GSE94555	human			single rnaseq				
+Peng	2016	GSE47460	human	lung	ipf	microarray	agilent	no	yes	Bauer, 2015a / Peng2016
+Marwick	2016	GSE90010	human	Macrophages – culture			affymetrix			
+Morrel	2017	GSE89953	human	Macrophages	ards	microarray	illumina			
+Umbright	2017	GSE49144	rat							
+XLv	2017	GSE77326	mice							
+Liu	2017	GSE98468	mice			rnaseq				
+Xi	2017	GSE83501	human			single rnaseq				
+Vukmirovic	2017	GSE83717				rnaseq				
+Schafer	2017	GSE92592				rnaseq				
 Misharin	2017	GSE82158	mice							
 Lee	2017	GSE71351	human	Fibroblasts – lung cells	ipf	microarray	illumina	no	yes	controls with cancer
 Marconett	2017	GSE59120	rat	alveolar epithelial cells – culture, bal, organs	cancer	microarray	illumina	no	yes	multiple organ, GSE38570, GSE38571, GSE66627

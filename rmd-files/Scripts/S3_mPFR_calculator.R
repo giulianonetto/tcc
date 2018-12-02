@@ -6,6 +6,7 @@
   library(ggpubr)
   library(ggloop)
   library(ggrepel)
+  library(ggfortify)
   library(qqplotr)
   library(rafalib)
   library(maSigPro)
@@ -105,6 +106,7 @@ mPFR <- function(sets_data.frame, exprs_matrix, Time, Treat) {
   df <- data.frame(Sets1 = I(s1l), Sets2 = I(s2l))
 }
 
+saveRDS(df, "data/mPFRcandidates")
 
 plot_signif <- function(df, formula, filters, 
                         titles = NULL, outTest = TRUE,
@@ -126,7 +128,7 @@ plot_signif <- function(df, formula, filters,
     print("Outliers check done!")
   }
   else print("Skip outlier tests...")
-  p <- ggplot(df, aes(x = treatment, y = value))
+  p <- ggplot(df, aes(x = treatment, y = value, color = treatment))
   stat <- stat_compare_means(comparisons = list(c("bleomycin", "control")),
                              method = method,
                              aes(label = ..p.signif..))
@@ -136,7 +138,7 @@ plot_signif <- function(df, formula, filters,
     p + stat + fac + geom_boxplot() + title
   }
   else {
-    p + stat + fac + geom_point() + geom_boxplot(alpha = 0.25) + title
+    p + stat + fac + geom_point() + geom_boxplot(alpha = 0.25) + title + ylim(0.06,0.11)
   }
 }
 
@@ -165,7 +167,8 @@ ggplot(mpfr.all.long, aes(sample = value)) +
 ggplot(mpfr.all.long, aes(value)) +
   geom_density() + xlim(-10,10)
 
-
+ggplot(mpfr.all.long[mpfr.all.long$variable == "S2",], aes(x = value)) +
+  geom_density()
 # PCA
 autoplot(prcomp(mpfr.all[,1:28], scale. = T), 
          data = mpfr.all, colour = "treatment", 
@@ -174,11 +177,24 @@ autoplot(prcomp(mpfr.all[,1:28], scale. = T),
          data = mpfr.all, colour = "times", 
          size = 2, shape = "treatment")
 
+# HCA
+{
+  library(RColorBrewer)
+  h <- mpfr.all[, 1:28]
+  rownames(h) <- make.names(paste0(mpfr.all$treatment,
+                        mpfr.all$times), unique = T)
+  my_group = as.numeric(as.factor(substr(rownames(h), 1 , 1)))
+  my_col = brewer.pal(9, "Set1")[my_group]
+  coul = colorRampPalette(brewer.pal(8, "Blues"))(25)
+  heatmap(as.matrix(h), scale = "row", 
+          col = coul, RowSideColors = my_col)
+
+}
 
 # Boxplots
 {
   day = 7
-  ivars <- 25; nvars <- 30
+  ivars <- 1; nvars <- 4
   filtro = mpfr.all.long$variable %in% unique(mpfr.all.long$variable)[ivars:nvars] &
     mpfr.all.long$times %in% day
   form <- value ~ treatment
@@ -235,15 +251,15 @@ ggplot(dat, aes(x = -log10(pval), y = Rsquared,
 
 # rsquared vs bleo effect (Estimate)
 ggplot(dat, aes(x = Rsquared, y = Estimate, 
-                label = variables)) +
+                label = variables, size = -log10(pval))) +
   geom_point(aes(color = ifelse(dat$pval < 0.05, "Significant", "Not significant"))) + 
   geom_text_repel(
     data = dat[dat$Rsquared >= 0.5, ],
     segment.alpha =  0.3) + 
   geom_vline(xintercept = 0.95, alpha = 0.5, linetype = "dashed", color = "blue") +
-  theme(legend.title = element_blank()) +
-  annotate("text", x = 0.91, y = 5.5, color = "blue", alpha = 0.5,
-           label = "R^2 == 0.95", parse = TRUE) +
+  labs(color = NULL, size = "-log10(pval)") +
+  annotate("text", x = 0.85, y = 5.5, color = "blue", alpha = 0.5,
+           label = "R^2 == 0.95", parse = TRUE, size = 6) +
   ylab("Bleomycin Effect")
 
 
@@ -317,12 +333,12 @@ autoplot(prcomp(mpfr.all[,1:9], scale. = T),
   day = 3
   ivars <- 1; nvars <- 9
   filtro = mpfr.all.long$variable %in% unique(mpfr.all.long$variable)[ivars:nvars] &
-    mpfr.all.long$times %in% day
+    mpfr.all.long$times %in% day & mpfr.all.long$variable == "m9m15"
   form <- value ~ treatment
   
   plot_signif(mpfr.all.long, form,
-              filtro, outTest = T,  method = "t.test",
-              titles = str_glue("Day {day}"), point = T)
+              filtro, outTest = T,  method = "wilcox.test",
+              titles = NULL, point = T)
   
 }
 

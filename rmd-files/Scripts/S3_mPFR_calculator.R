@@ -191,6 +191,18 @@ autoplot(prcomp(mpfr.all[,1:28], scale. = T),
 
 }
 
+# HCA with original data
+
+{
+  h <- genexp[!grepl("^X.[0-9]+", rownames(genexp)),] %>% t()
+  my_group = as.numeric(as.factor(substr(rownames(h), 1 , 1)))
+  my_col = brewer.pal(9, "Set1")[my_group]
+  coul = colorRampPalette(brewer.pal(8, "Blues"))(25)
+  heatmap(as.matrix(h), scale = "row", 
+          col = coul, RowSideColors = my_col)
+  
+}
+
 # Boxplots
 {
   day = 7

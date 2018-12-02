@@ -473,13 +473,15 @@ ggplot(dat, aes(x = Estimate, y = -log10(pval),
 
 {
   ggplot(dat, aes(x = Rsquared, y = Estimate, 
-                  label = variables)) +
+                  label = variables, size = -log10(pval))) +
     geom_point(aes(color = ifelse(dat$pval < 0.05, "Significant", "Not significant"))) + 
     geom_text_repel(
-      data = dat[dat$Rsquared >= 0.5, ],
-      segment.alpha =  0.3) + 
+      data = dat[dat$Rsquared >= 0.5 | dat$variables == "S1", ],
+      segment.alpha =  0.3,
+      nudge_x = 0.05,
+      nudge_y = 1) + 
     geom_vline(xintercept = 0.95, alpha = 0.5, linetype = "dashed", color = "blue") +
-    theme(legend.title = element_blank()) +
+    labs(color = NULL, size = "-log10(pval)") +
     annotate("text", x = 0.85, y = 5.5, color = "blue", alpha = 0.5,
              label = "R^2 == 0.95", parse = TRUE) +
     ylab("IPF Effect")

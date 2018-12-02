@@ -141,6 +141,7 @@ output:
 
 __BOTAR TABELA NA MAO - DEVEL_FILES/FIGS/RPACKS.TSV__
   
+  [@DePianto2015; @Kabacoff2015]
   
 # References
 

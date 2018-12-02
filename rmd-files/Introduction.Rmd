@@ -192,6 +192,7 @@ ggplot(colcount, aes(x=module, y=Counts, fill=color_factor))+
 
 __BOTAR TABELA NA MAO - DEVEL_FILES/FIGS/RPACKS.TSV__
   
+  [@DePianto2015; @Kabacoff2015]
   
 # References
 
